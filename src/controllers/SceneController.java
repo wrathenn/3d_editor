@@ -1,7 +1,9 @@
 package controllers;
 
 import exceptions.ExistedNameException;
+import exceptions.NotExistedNameException;
 import models.Camera;
+import models.Point;
 import models.Shape;
 import repositories.SceneRepository;
 import services.SceneService;
@@ -43,5 +45,9 @@ public class SceneController {
 
     public ArrayList<Shape> getShapesToDraw() {
         return service.getShapesToDraw();
+    }
+
+    public Point findPoint(String name) throws NotExistedNameException {
+        return service.findPoint(name);
     }
 }

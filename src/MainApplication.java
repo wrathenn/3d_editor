@@ -1,15 +1,20 @@
 import controllers.DrawController;
 import controllers.SceneController;
 import exceptions.ExistedNameException;
+import exceptions.NotExistedNameException;
 import models.Camera;
+import models.Edge;
 import models.Shape;
+import models.Point;
 import repositories.SceneRepository;
 import scene.actions.DrawerVisitor;
 import services.DrawService;
 import services.SceneService;
+import views.AddEdgeCallback;
+import views.user_input.AddEdgeView;
 import views.user_input.AddPointView;
 import views.CanvasView;
-import views.ShapeCallback;
+import views.AddPointCallback;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,7 +60,7 @@ public class MainApplication extends JFrame {
         infoPanel.add(addPointButton);
 
         addEdgeButton = new JButton("Add edge");
-        ;
+
         addEdgeButton.setSize(infoPanel.getSize().width, 20);
         infoPanel.add(addEdgeButton);
 
@@ -92,37 +97,43 @@ public class MainApplication extends JFrame {
 
         canvas.setSceneRepository(sceneController.getStore());
 
-        drawButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                drawController.draw(canvas.getGraphics(), currentCamera, sceneController.getShapesToDraw());
-            }
+        drawButton.addActionListener(e ->
+                drawController.draw(canvas.getGraphics(), currentCamera, sceneController.getShapesToDraw()));
+
+        addPointButton.addActionListener(e -> {
+            AddPointView frame = new AddPointView();
+            frame.setAddCallback(s -> {
+                try {
+                    sceneController.add(s);
+                } catch (ExistedNameException e1) {
+                    System.out.println(e1.getMessage());
+                }
+            });
+
+            frame.setVisible(true);
         });
 
-        addPointButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                AddPointView frame = new AddPointView();
-                frame.setAddCallback(new ShapeCallback() {
-                    @Override
-                    public void callback(Shape s) {
-                        try {
-                            sceneController.add(s);
-                        } catch (ExistedNameException e) {
-                            System.out.println("Есть точка с таким именем");
-                        }
-                    }
-                });
+        addEdgeButton.addActionListener(e -> {
+            AddEdgeView frame = new AddEdgeView();
 
-                frame.setVisible(true);
-            }
-        });
+            frame.setAddCallback((p1Name, p2Name) -> {
+                Point p1, p2;
+                try {
+                    p1 = sceneController.findPoint(p1Name);
+                    p2 = sceneController.findPoint(p2Name);
+                } catch (NotExistedNameException ex) {
+                    System.out.println(ex.getMessage());
+                    return; // TODO: errorView
+                }
 
-        addEdgeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+                try {
+                    sceneController.add(new Edge(p1, p2));
+                } catch (ExistedNameException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            });
 
-            }
+            frame.setVisible(true);
         });
     }
 

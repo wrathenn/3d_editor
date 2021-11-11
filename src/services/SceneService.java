@@ -1,6 +1,7 @@
 package services;
 
 import exceptions.ExistedNameException;
+import exceptions.NotExistedNameException;
 import models.*;
 import repositories.SceneRepository;
 
@@ -34,7 +35,6 @@ public class SceneService {
     public void add(Shape shape) throws ExistedNameException {
         if (shape instanceof Point) {
                 sceneRepository.add((Point) shape);
-
         }
         else if (shape instanceof Edge) {
             sceneRepository.add((Edge) shape);
@@ -67,9 +67,16 @@ public class SceneService {
         final ArrayList<Point> points = sceneRepository.getPoints();
         ArrayList<Shape> shapes = new ArrayList<>(points);
 
+        ArrayList<Edge> edges = sceneRepository.getEdges();
+        shapes.addAll(edges);
+
         ArrayList<Polygon> polygons = sceneRepository.getPolygons();
         shapes.addAll(polygons);
 
         return shapes;
+    }
+
+    public Point findPoint(String name) throws NotExistedNameException {
+        return sceneRepository.findPoint(name);
     }
 }

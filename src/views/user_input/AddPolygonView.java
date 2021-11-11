@@ -1,18 +1,17 @@
 package views.user_input;
 
 import views.AddEdgeCallback;
-import views.AddPointCallback;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AddEdgeView extends JFrame {
+public class AddPolygonView extends JFrame {
 
-    private final JLabel headingLabel = new JLabel("Input Edge parameters");
+    private final JLabel headingLabel = new JLabel("Input Polygon parameters");
 
-    private final JLabel point1Label = new JLabel("Input P1:");
+    private final JLabel point1Label = new JLabel("Input Edges:");
     private final JTextField inputP1 = new JTextField("P1", 1);
 
     private final JLabel point2Label = new JLabel("Input P2:");
@@ -27,7 +26,7 @@ public class AddEdgeView extends JFrame {
         this.addCallback = addCallback;
     }
 
-    public AddEdgeView() throws HeadlessException {
+    public AddPolygonView() throws HeadlessException {
         super("Create new point");
 
         setMinimumSize(new Dimension(200, 160));;

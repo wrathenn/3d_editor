@@ -1,6 +1,7 @@
 package repositories;
 
 import exceptions.ExistedNameException;
+import exceptions.NotExistedNameException;
 import models.Camera;
 import models.Point;
 import models.Edge;
@@ -43,17 +44,13 @@ public class SceneRepository {
     // ----- Методы ----- //
 
     public void add(Point p) throws ExistedNameException {
-        String newName = p.getNameID();
-        // Добавить проверку
-        for (Point point :
-                points) {
-            if (point.getNameID().equals(newName)) {
-                throw new ExistedNameException("Point with name \" " + point.getNameID() + "\" already exists");
-            }
+        try {
+            findPoint(p.getNameID());
+            throw new ExistedNameException("Уже существует точка с именем " + p.getNameID());
+        } catch (NotExistedNameException e) {
+            System.out.println("Добавление точки " + p.getNameID());
+            points.add(p);
         }
-
-        System.out.println("Добавление точки " + p.toString());
-        points.add(p);
     }
 
     public void add(Edge e) {
@@ -81,6 +78,15 @@ public class SceneRepository {
 
     public void addCamera(Camera camera) {
         this.cameras.add(camera);
+    }
+
+    public Point findPoint(String name) throws NotExistedNameException {
+        for (Point p : points) {
+            if (Objects.equals(p.getNameID(), name)) {
+                return p;
+            }
+        }
+        throw new NotExistedNameException("Не существует точки с именем" + name);
     }
 
     public ArrayList<Polygon> find(Point p) {

@@ -28,13 +28,18 @@ public class DrawerVisitor extends DrawVisitor {
     @Override
     public void visit(Point p) {
         canvas.drawOval((int) p.getX(), (int) p.getY(), 2, 2);
-        canvas.drawString("P", (int) p.getX() - 2, (int) p.getY() - 2);
+        canvas.drawString(p.getNameID(), (int) p.getX() - 2, (int) p.getY() - 2);
 
         System.out.println("Drawing point");
     }
 
     @Override
     public void visit(Edge e) {
+        canvas.drawLine((int) e.getBegin().getX(),
+                (int) e.getBegin().getY(),
+                (int) e.getEnd().getX(),
+                (int) e.getEnd().getY());
+
         System.out.println("Drawing edge");
     }
 

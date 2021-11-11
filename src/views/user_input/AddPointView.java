@@ -1,7 +1,7 @@
 package views.user_input;
 
 import models.Point;
-import views.ShapeCallback;
+import views.AddPointCallback;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,9 +24,9 @@ public class AddPointView extends JFrame {
 
     private final JButton addButton = new JButton("Add Point");
 
-    private ShapeCallback addCallback;
+    private AddPointCallback addCallback;
 
-    public void setAddCallback(ShapeCallback addCallback) {
+    public void setAddCallback(AddPointCallback addCallback) {
         this.addCallback = addCallback;
     }
 

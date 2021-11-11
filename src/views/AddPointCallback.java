@@ -2,6 +2,6 @@ package views;
 
 import models.Shape;
 
-public interface ShapeCallback {
+public interface AddPointCallback {
     void callback(Shape s);
 }
