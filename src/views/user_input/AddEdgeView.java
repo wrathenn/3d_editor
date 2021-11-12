@@ -1,7 +1,6 @@
 package views.user_input;
 
-import views.AddEdgeCallback;
-import views.AddPointCallback;
+import views.callbacks.AddEdgeCallback;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +27,7 @@ public class AddEdgeView extends JFrame {
     }
 
     public AddEdgeView() throws HeadlessException {
-        super("Create new point");
+        super("Create new edge");
 
         setMinimumSize(new Dimension(200, 160));;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);

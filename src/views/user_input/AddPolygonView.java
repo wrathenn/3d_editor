@@ -1,35 +1,35 @@
 package views.user_input;
 
-import views.AddEdgeCallback;
+import models.Point;
+
+import views.callbacks.AddEdgeCallback;
+import views.callbacks.AddPolygonCallback;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class AddPolygonView extends JFrame {
-
     private final JLabel headingLabel = new JLabel("Input Polygon parameters");
 
-    private final JLabel point1Label = new JLabel("Input Edges:");
-    private final JTextField inputP1 = new JTextField("P1", 1);
+    private final JLabel pointsLabel = new JLabel("Input Points (P1, P2, ..., Pn):");
+    private final JTextField inputPoints = new JTextField("", 1);
 
-    private final JLabel point2Label = new JLabel("Input P2:");
-    private final JTextField inputP2 = new JTextField("P1", 1);
+    private final JButton addButton = new JButton("Add Polygon");
 
+    private AddPolygonCallback addCallback;
 
-    private final JButton addButton = new JButton("Add Edge");
-
-    private AddEdgeCallback addCallback;
-
-    public void setAddCallback(AddEdgeCallback addCallback) {
+    public void setAddCallback(AddPolygonCallback addCallback) {
         this.addCallback = addCallback;
     }
 
     public AddPolygonView() throws HeadlessException {
-        super("Create new point");
+        super("Create new polygon");
 
-        setMinimumSize(new Dimension(200, 160));;
+        setMinimumSize(new Dimension(200, 160));
+        ;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         Container pane = this.getContentPane();
@@ -48,34 +48,23 @@ public class AddPolygonView extends JFrame {
         config.fill = GridBagConstraints.VERTICAL;
         pane.add(headingLabel, config);
 
-        yPosition += 1;
+        yPosition++;
 
-        point1Label.setHorizontalAlignment(SwingConstants.LEFT);
+        pointsLabel.setHorizontalAlignment(SwingConstants.LEFT);
         config.gridx = 0;
         config.gridy = yPosition;
         config.gridwidth = 1;
         config.fill = GridBagConstraints.VERTICAL;
-        pane.add(point1Label, config);
+        pane.add(pointsLabel, config);
 
-        config.gridx = 1;
-        config.gridy = yPosition;
-        config.fill = GridBagConstraints.BOTH;
-        pane.add(inputP1, config);
+        yPosition++;
 
-        yPosition += 1;
-
-        point2Label.setHorizontalAlignment(SwingConstants.LEFT);
         config.gridx = 0;
         config.gridy = yPosition;
-        config.fill = GridBagConstraints.VERTICAL;
-        pane.add(point2Label, config);
-
-        config.gridx = 1;
-        config.gridy = yPosition;
         config.fill = GridBagConstraints.BOTH;
-        pane.add(inputP2, config);
+        pane.add(inputPoints, config);
 
-        yPosition += 1;
+        yPosition++;
 
         config.gridx = 0;
         config.gridy = yPosition;
@@ -87,7 +76,11 @@ public class AddPolygonView extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                addCallback.callback(inputP1.getText(), inputP2.getText());
+                String pStr = inputPoints.getText();
+                String[] pNames = pStr.split(", ");
+
+                // TODO: проверка на ошибку
+                addCallback.callback(pNames);
                 dispose();
             }
         });

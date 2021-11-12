@@ -4,22 +4,20 @@ import exceptions.ExistedNameException;
 import exceptions.NotExistedNameException;
 import models.Camera;
 import models.Edge;
-import models.Shape;
 import models.Point;
+import models.Polygon;
 import repositories.SceneRepository;
 import scene.actions.DrawerVisitor;
 import services.DrawService;
 import services.SceneService;
-import views.AddEdgeCallback;
 import views.user_input.AddEdgeView;
 import views.user_input.AddPointView;
 import views.CanvasView;
-import views.AddPointCallback;
+import views.user_input.AddPolygonView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class MainApplication extends JFrame {
     private final int DEFAULT_WIDTH = 1280;
@@ -30,6 +28,7 @@ public class MainApplication extends JFrame {
     JButton drawButton;
     JButton addPointButton;
     JButton addEdgeButton;
+    JButton addPolygonButton;
 
     // architecture stuff
     private SceneController sceneController;
@@ -50,19 +49,26 @@ public class MainApplication extends JFrame {
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
 
-        drawButton = new JButton("draw");
-
-        drawButton.setSize(drawButton.getMaximumSize());
-        infoPanel.add(drawButton);
-
-        addPointButton = new JButton("Add point");
-        addPointButton.setSize(infoPanel.getSize().width, 20);
-        infoPanel.add(addPointButton);
-
-        addEdgeButton = new JButton("Add edge");
-
-        addEdgeButton.setSize(infoPanel.getSize().width, 20);
-        infoPanel.add(addEdgeButton);
+        {
+            drawButton = new JButton("draw");
+            drawButton.setSize(drawButton.getMaximumSize());
+            infoPanel.add(drawButton);
+        }
+        {
+            addPointButton = new JButton("Add point");
+            addPointButton.setSize(infoPanel.getSize().width, 20);
+            infoPanel.add(addPointButton);
+        }
+        {
+            addEdgeButton = new JButton("Add edge");
+            addEdgeButton.setSize(infoPanel.getSize().width, 20);
+            infoPanel.add(addEdgeButton);
+        }
+        {
+            addPolygonButton = new JButton("Add Polygon");
+            addPolygonButton.setSize(infoPanel.getSize().width, 20);
+            infoPanel.add(addPolygonButton);
+        }
 
         config.gridy = 0;
         config.weightx = 1;
@@ -130,6 +136,35 @@ public class MainApplication extends JFrame {
                     sceneController.add(new Edge(p1, p2));
                 } catch (ExistedNameException ex) {
                     System.out.println(ex.getMessage());
+                }
+            });
+
+            frame.setVisible(true);
+        });
+
+        addPolygonButton.addActionListener(e -> {
+            AddPolygonView frame = new AddPolygonView();
+
+            frame.setAddCallback(pointNames -> {
+                ArrayList<Point> points = new ArrayList<>();
+                for (String pName : pointNames) {
+                    try {
+                        points.add(sceneController.findPoint(pName));
+                    }
+                    catch (NotExistedNameException ex) {
+                        System.out.println(ex.getMessage());
+                        return; // TODO: errorView
+                    }
+                }
+
+                Point[] pArr = new Point[points.size()];
+                Polygon newPoly = new Polygon(points.toArray(pArr));
+
+                try {
+                    sceneController.add(newPoly);
+                } catch (ExistedNameException ex) {
+                    System.out.println(ex.getMessage());
+                    // TODO: errorView
                 }
             });
 

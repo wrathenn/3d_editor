@@ -46,7 +46,10 @@ public class DrawerVisitor extends DrawVisitor {
     @Override
     public void visit(Polygon p) {
         for (Edge e : p.getEdges()) {
-            canvas.drawLine((int) e.getBegin().getX(), (int) e.getBegin().getY(), (int) e.getEnd().getX(), (int) e.getEnd().getY());
+            canvas.drawLine((int) e.getBegin().getX(),
+                    (int) e.getBegin().getY(),
+                    (int) e.getEnd().getX(),
+                    (int) e.getEnd().getY());
         }
 
         System.out.println("Drawing Polygon");

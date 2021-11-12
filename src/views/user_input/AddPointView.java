@@ -1,7 +1,7 @@
 package views.user_input;
 
 import models.Point;
-import views.AddPointCallback;
+import views.callbacks.AddPointCallback;
 
 import javax.swing.*;
 import java.awt.*;

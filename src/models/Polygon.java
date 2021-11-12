@@ -9,11 +9,11 @@ import java.util.Objects;
 public class Polygon implements Shape {
     private ArrayList<Edge> edges;
 
-    Polygon() {
+    public Polygon() {
         this.edges = new ArrayList<Edge>();
     }
 
-    Polygon(Point[] points) throws IllegalArgumentException {
+    public Polygon(Point[] points) throws IllegalArgumentException {
         if (points.length < 3) {
             throw new IllegalArgumentException("Incorrect dots amount to make polygon - " + points.length + " (need 3 or more)");
         }

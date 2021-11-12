@@ -23,6 +23,13 @@ public class Point implements Shape {
         this.z = z;
     }
 
+    public Point(String nameId) {
+        this.nameID = nameId;
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
+
     public Point(float x, float y, float z) {
         this.x = x;
         this.y = y;
