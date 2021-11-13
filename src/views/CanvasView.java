@@ -30,8 +30,6 @@ public class CanvasView extends JPanel implements MouseListener {
 
     @Override
     public void paintComponent(Graphics g) {
-        g.setColor(Color.blue);
-        g.drawOval(100, 100, 160, 175);
     }
 
     @Override

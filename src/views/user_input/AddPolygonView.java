@@ -25,7 +25,7 @@ public class AddPolygonView extends JFrame {
         this.addCallback = addCallback;
     }
 
-    public AddPolygonView() throws HeadlessException {
+    public AddPolygonView() {
         super("Create new polygon");
 
         setMinimumSize(new Dimension(200, 160));

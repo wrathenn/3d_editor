@@ -4,9 +4,9 @@ import shared.Visitor;
 
 public class Point implements Shape {
     String nameID;
-    private float x;
-    private float y;
-    private float z;
+    public float x;
+    public float y;
+    public float z;
 
     // ----- Конструкторы ----- //
 
