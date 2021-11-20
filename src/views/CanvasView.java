@@ -8,22 +8,22 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
-public class CanvasView extends JPanel implements MouseListener {
+public class CanvasView extends JPanel implements MouseListener, MouseMotionListener {
 
     public SceneRepository sceneRepository;
-
-    private int oldX = 0;
-    private int oldY = 0;
 
     public CanvasView() {
         super();
         addMouseListener(this);
+        addMouseMotionListener(this);
     }
 
     public CanvasView(SceneRepository sceneStore) {
         super();
         addMouseListener(this);
+        addMouseMotionListener(this);
 
         this.sceneRepository = sceneStore;
     }
@@ -41,6 +41,28 @@ public class CanvasView extends JPanel implements MouseListener {
 
     }
 
+    private int oldX = 0;
+    private int oldY = 0;
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        int curX = e.getX();
+        int curY = e.getY();
+
+        Camera camera = sceneRepository.getCamera(0);
+        camera.setX(camera.getX() + (curX - oldX));
+        camera.setY(camera.getY() + (curY - oldY));
+
+        oldX = curX;
+        oldY = curY;
+        System.out.println("asd");
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+//        System.out.println("asd2");
+    }
+
     @Override
     public void mousePressed(MouseEvent e) {
         oldX = e.getX();
@@ -51,12 +73,12 @@ public class CanvasView extends JPanel implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        int curX = e.getX();
-        int curY = e.getY();
-
-        Camera camera = sceneRepository.getCamera(0);
-        camera.setX(camera.getX() + (curX - oldX));
-        camera.setY(camera.getY() + (curY - oldY));
+//        int curX = e.getX();
+//        int curY = e.getY();
+//
+//        Camera camera = sceneRepository.getCamera(0);
+//        camera.setX(camera.getX() + (curX - oldX));
+//        camera.setY(camera.getY() + (curY - oldY));
         System.out.println("released");
     }
 

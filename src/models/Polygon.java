@@ -1,6 +1,6 @@
 package models;
 
-import shared.Visitor;
+import repositories.Visitor;
 
 import java.util.ArrayList;
 import java.util.Arrays;

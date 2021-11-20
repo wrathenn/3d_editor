@@ -7,9 +7,7 @@ import models.Edge;
 import models.Point;
 import models.Polygon;
 import repositories.SceneRepository;
-import scene.actions.DrawerVisitor;
-import services.DrawService;
-import services.SceneService;
+import repositories.DrawerVisitor;
 import views.user_input.AddEdgeView;
 import views.user_input.AddPointView;
 import views.CanvasView;
@@ -33,8 +31,6 @@ public class MainApplication extends JFrame {
     // architecture stuff
     private SceneController sceneController;
     private DrawController drawController;
-
-    private Camera currentCamera = new Camera();
 
     private void initGUI() {
         setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -74,6 +70,10 @@ public class MainApplication extends JFrame {
         config.weightx = 1;
         config.weighty = 1;
         config.fill = GridBagConstraints.BOTH;
+        infoPanel.setMaximumSize(new Dimension(100, 0));
+        infoPanel.setPreferredSize(new Dimension(100, 0));
+        infoPanel.setMinimumSize(new Dimension(100, 0));
+        infoPanel.setBackground(Color.gray);
         pane.add(infoPanel, config);
 
         canvas = new CanvasView();
@@ -88,21 +88,11 @@ public class MainApplication extends JFrame {
         super(title);
         initGUI();
 
-        sceneController =
-                new SceneController(
-                        new SceneService(
-                                new SceneRepository()
-                        )
-                );
+        sceneController = new SceneController(new SceneRepository());
 
-        drawController =
-                new DrawController(
-                        new DrawService(
-                                new DrawerVisitor()
-                        )
-                );
+        drawController = new DrawController(new DrawerVisitor());
 
-        canvas.setSceneRepository(sceneController.getStore());
+        canvas.setSceneRepository(sceneController.getSceneRepository());
 
         drawButton.addActionListener(e -> {
             Camera camera = sceneController.getCamera(0);
@@ -154,8 +144,7 @@ public class MainApplication extends JFrame {
                 for (String pName : pointNames) {
                     try {
                         points.add(sceneController.findPoint(pName));
-                    }
-                    catch (NotExistedNameException ex) {
+                    } catch (NotExistedNameException ex) {
                         System.out.println(ex.getMessage());
                         return; // TODO: errorView
                     }

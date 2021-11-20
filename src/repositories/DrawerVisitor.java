@@ -1,9 +1,9 @@
-package scene.actions;
+package repositories;
 
 import models.*;
 import models.Point;
 import models.Polygon;
-import shared.DrawVisitor;
+import repositories.DrawVisitor;
 
 import java.awt.*;
 

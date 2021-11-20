@@ -1,6 +1,6 @@
 package models;
 
-import shared.Visitor;
+import repositories.Visitor;
 
 public class Point implements Shape {
     String nameID;

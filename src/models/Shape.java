@@ -1,6 +1,6 @@
 package models;
 
-import shared.Visitor;
+import repositories.Visitor;
 
 public interface Shape {
     public void accept(Visitor visitor);

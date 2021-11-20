@@ -1,4 +1,4 @@
-package shared;
+package repositories;
 
 
 import models.Camera;
