@@ -29,6 +29,8 @@ public class DrawController {
     // ----- Нормальные методы ----- //
 
     public void draw(Graphics canvas, Camera camera, ArrayList<Shape> shapes) {
+        canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
+
         service.setCanvas(canvas);
         service.setCamera(camera);
 

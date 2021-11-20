@@ -1,5 +1,6 @@
 package views;
 
+import models.Camera;
 import repositories.SceneRepository;
 import models.Point;
 
@@ -11,6 +12,9 @@ import java.awt.event.MouseListener;
 public class CanvasView extends JPanel implements MouseListener {
 
     public SceneRepository sceneRepository;
+
+    private int oldX = 0;
+    private int oldY = 0;
 
     public CanvasView() {
         super();
@@ -39,14 +43,20 @@ public class CanvasView extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
+        oldX = e.getX();
+        oldY = e.getY();
 
-//        sceneRepository.add(new Point(x, y, 0));
+        System.out.println("pressed - " + oldX + ", " + oldY);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        int curX = e.getX();
+        int curY = e.getY();
+
+        Camera camera = sceneRepository.getCamera(0);
+        camera.setX(camera.getX() + (curX - oldX));
+        camera.setY(camera.getY() + (curY - oldY));
         System.out.println("released");
     }
 
@@ -57,6 +67,6 @@ public class CanvasView extends JPanel implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
-        System.out.println("exited");
+        System.out.println("exited - " + getSize().width + ", " + getSize().height);
     }
 }

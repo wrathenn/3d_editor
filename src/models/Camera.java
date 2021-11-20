@@ -9,24 +9,24 @@ public class Camera {
     private double z;
 
     private double screenDistance;
-    private int fov;
+
+    private int screenWidth;
+    private int screenHeight;
 
     private Matrix rotateMatrix;
     private Matrix scaleMatrix;
     private Matrix moveMatrix;
 
-    private final int DEFAULT_FOV = 120;
     private final int DEFAULT_SCREEN_DISTANCE = 10;
     private final int DEFAULT_X = 0;
     private final int DEFAULT_Y = 0;
-    private final int DEFAULT_Z = -20;
+    private final int DEFAULT_Z = -5;
 
     public Camera() {
         this.x = DEFAULT_X;
         this.y = DEFAULT_Y;
         this.z = DEFAULT_Z;
 
-        this.fov = DEFAULT_FOV;
         this.screenDistance = DEFAULT_SCREEN_DISTANCE;
 
         rotateMatrix = Matrix.identity(3, 3);
@@ -34,12 +34,11 @@ public class Camera {
         moveMatrix = Matrix.identity(3, 3);
     }
 
-    public Camera(double x, double y, double z, double screenDistance, int fov) {
+    public Camera(double x, double y, double z, double screenDistance) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.screenDistance = screenDistance;
-        this.fov = fov;
 
         rotateMatrix = Matrix.identity(3, 3);
         scaleMatrix = Matrix.identity(3, 3);
@@ -78,11 +77,16 @@ public class Camera {
         this.screenDistance = screenDistance;
     }
 
-    public int getFov() {
-        return fov;
+    public void setDimensions(int width, int height) {
+        screenWidth = width;
+        screenHeight = height;
     }
 
-    public void setFov(int fov) {
-        this.fov = fov;
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
     }
 }

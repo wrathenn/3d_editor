@@ -50,4 +50,8 @@ public class SceneController {
     public Point findPoint(String name) throws NotExistedNameException {
         return service.findPoint(name);
     }
+
+    public Camera getCamera(int index) {
+        return service.getCamera(index);
+    }
 }

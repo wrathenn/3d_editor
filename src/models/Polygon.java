@@ -13,6 +13,10 @@ public class Polygon implements Shape {
         this.edges = new ArrayList<Edge>();
     }
 
+    public Polygon(ArrayList<Edge> edges) {
+        this.edges = edges;
+    }
+
     public Polygon(Point[] points) throws IllegalArgumentException {
         if (points.length < 3) {
             throw new IllegalArgumentException("Incorrect dots amount to make polygon - " + points.length + " (need 3 or more)");

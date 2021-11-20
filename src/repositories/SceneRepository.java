@@ -22,23 +22,40 @@ public class SceneRepository {
 
     public SceneRepository() {
         points = new ArrayList<>(Arrays.asList(
-                new Point("M1", 50, 50, 1),
-                new Point("M2", 50, 100, 1),
-                new Point("M3", 100, 50, 1),
-                new Point("M4", 100, 100, 1),
-                new Point("M5", 100, 75, 1),
-                new Point("M6", 75, 100, 1)));
+                new Point("M1", -50, 50, 0),
+                new Point("M2", 50, 50, 0),
+                new Point("M3", 50, -50, 0),
+                new Point("M4", -50, -50, 0),
+                new Point("M5", -50, 50, 100),
+                new Point("M6", 50, 50, 100),
+                new Point("M7", 50, -50, 100),
+                new Point("M8", -50, -50, 100)
+        ));
         edges = new ArrayList<>();
         {
             edges.add(new Edge(points.get(0), points.get(1)));
-            edges.add(new Edge(points.get(0), points.get(2)));
-            edges.add(new Edge(points.get(0), points.get(3)));
+            edges.add(new Edge(points.get(1), points.get(2)));
+            edges.add(new Edge(points.get(2), points.get(3)));
+            edges.add(new Edge(points.get(3), points.get(0)));
+
             edges.add(new Edge(points.get(0), points.get(4)));
-            edges.add(new Edge(points.get(0), points.get(5)));
+            edges.add(new Edge(points.get(1), points.get(5)));
+            edges.add(new Edge(points.get(2), points.get(6)));
+            edges.add(new Edge(points.get(3), points.get(7)));
+
+
+            edges.add(new Edge(points.get(4), points.get(5)));
+            edges.add(new Edge(points.get(5), points.get(6)));
+            edges.add(new Edge(points.get(6), points.get(7)));
+            edges.add(new Edge(points.get(7), points.get(4)));
         }
         polygons = new ArrayList<>();
+        {
+            polygons.add(new Polygon(edges)); // TODO: костыль убрать
+        }
 
         cameras = new ArrayList<>();
+        cameras.add(new Camera());
     }
 
     // ----- Геттеры и Сеттеры ----- //

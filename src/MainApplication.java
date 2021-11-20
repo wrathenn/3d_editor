@@ -20,8 +20,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class MainApplication extends JFrame {
-    private final int DEFAULT_WIDTH = 1280;
-    private final int DEFAULT_HEIGHT = 800;
+    private final int DEFAULT_WIDTH = 640;
+    private final int DEFAULT_HEIGHT = 640;
 
     CanvasView canvas;
 
@@ -77,7 +77,8 @@ public class MainApplication extends JFrame {
         pane.add(infoPanel, config);
 
         canvas = new CanvasView();
-        canvas.setBackground(Color.ORANGE);
+//        canvas.setSize(300, 300); // TODO
+        canvas.setBackground(Color.green);
         config.gridx = 1;
         config.weightx = 4;
         pane.add(canvas, config);
@@ -103,8 +104,11 @@ public class MainApplication extends JFrame {
 
         canvas.setSceneRepository(sceneController.getStore());
 
-        drawButton.addActionListener(e ->
-                drawController.draw(canvas.getGraphics(), currentCamera, sceneController.getShapesToDraw()));
+        drawButton.addActionListener(e -> {
+            Camera camera = sceneController.getCamera(0);
+            camera.setDimensions(canvas.getWidth(), canvas.getHeight());
+            drawController.draw(canvas.getGraphics(), sceneController.getCamera(0), sceneController.getShapesToDraw());
+        });
 
         addPointButton.addActionListener(e -> {
             AddPointView frame = new AddPointView();

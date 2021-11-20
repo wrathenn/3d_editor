@@ -4,9 +4,9 @@ import shared.Visitor;
 
 public class Point implements Shape {
     String nameID;
-    public float x;
-    public float y;
-    public float z;
+    public double x;
+    public double y;
+    public double z;
 
     // ----- Конструкторы ----- //
 
@@ -16,7 +16,7 @@ public class Point implements Shape {
         this.z = 0;
     }
 
-    public Point(String nameID, float x, float y, float z) {
+    public Point(String nameID, double x, double y, double z) {
         this.nameID = nameID;
         this.x = x;
         this.y = y;
@@ -30,15 +30,22 @@ public class Point implements Shape {
         this.z = 0;
     }
 
-    public Point(float x, float y, float z) {
+    public Point(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
+    public Point(Point p) {
+        this.x = p.x;
+        this.y = p.y;
+        this.z = p.z;
+        this.nameID = p.nameID;
+    }
+
     // ----- Геттеры и Сеттеры ----- //
 
-    public float getX() {
+    public double getX() {
         return x;
     }
 
@@ -46,7 +53,7 @@ public class Point implements Shape {
         this.x = x;
     }
 
-    public float getY() {
+    public double getY() {
         return y;
     }
 
@@ -54,7 +61,7 @@ public class Point implements Shape {
         this.y = y;
     }
 
-    public float getZ() {
+    public double getZ() {
         return z;
     }
 
