@@ -18,8 +18,10 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class MainApplication extends JFrame {
-    private final int DEFAULT_WIDTH = 640;
+    private final int DEFAULT_WIDTH = 960;
     private final int DEFAULT_HEIGHT = 640;
+
+    private final int BUTTON_PANEL_WIDTH = 100;
 
     CanvasView canvas;
 
@@ -56,6 +58,7 @@ public class MainApplication extends JFrame {
             infoPanel.add(addPolygonButton);
         }
 
+        infoPanel.setMaximumSize(new Dimension(BUTTON_PANEL_WIDTH, DEFAULT_HEIGHT));
         infoPanel.setBackground(Color.gray);
 
         return infoPanel;
@@ -71,7 +74,7 @@ public class MainApplication extends JFrame {
         pane.add(buildButtonPanel());
 
         canvas = new CanvasView();
-        canvas.setMaximumSize(new Dimension(300, 300));
+        canvas.setMaximumSize(new Dimension(DEFAULT_WIDTH - BUTTON_PANEL_WIDTH, DEFAULT_HEIGHT));
         pane.add(canvas);
     }
 
