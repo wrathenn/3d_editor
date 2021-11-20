@@ -43,6 +43,7 @@ public class DrawController {
 
     public void draw(Graphics canvas, Camera camera, ArrayList<Shape> shapes) {
         canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
+        canvas.drawRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
 
         drawVisitor.setCanvas(canvas);
         drawVisitor.setCamera(camera);

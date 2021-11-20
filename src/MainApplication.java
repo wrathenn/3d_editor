@@ -32,19 +32,9 @@ public class MainApplication extends JFrame {
     private SceneController sceneController;
     private DrawController drawController;
 
-    private void initGUI() {
-        setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        Container pane = getContentPane();
-        pane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-        pane.setLayout(new GridBagLayout());
-        GridBagConstraints config = new GridBagConstraints();
-
+    private JPanel buildButtonPanel() {
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
-
         {
             drawButton = new JButton("draw");
             drawButton.setSize(drawButton.getMaximumSize());
@@ -66,22 +56,23 @@ public class MainApplication extends JFrame {
             infoPanel.add(addPolygonButton);
         }
 
-        config.gridy = 0;
-        config.weightx = 1;
-        config.weighty = 1;
-        config.fill = GridBagConstraints.BOTH;
-        infoPanel.setMaximumSize(new Dimension(100, 0));
-        infoPanel.setPreferredSize(new Dimension(100, 0));
-        infoPanel.setMinimumSize(new Dimension(100, 0));
         infoPanel.setBackground(Color.gray);
-        pane.add(infoPanel, config);
+
+        return infoPanel;
+    }
+
+    private void initGUI() {
+        setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        Container pane = getContentPane();
+        pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
+
+        pane.add(buildButtonPanel());
 
         canvas = new CanvasView();
-//        canvas.setSize(300, 300); // TODO
-        canvas.setBackground(Color.green);
-        config.gridx = 1;
-        config.weightx = 4;
-        pane.add(canvas, config);
+        canvas.setMaximumSize(new Dimension(300, 300));
+        pane.add(canvas);
     }
 
     public MainApplication(String title) {
