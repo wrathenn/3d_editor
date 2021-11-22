@@ -48,6 +48,10 @@ public class Edge implements Shape {
         return false;
     }
 
+    public Edge deepCopy() {
+        return new Edge(begin.deepCopy(), end.deepCopy());
+    }
+
     @Override
     public void accept(Visitor visitor) {
         visitor.visit(this);

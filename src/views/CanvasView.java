@@ -53,9 +53,10 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         camera.setX(camera.getX() + (curX - oldX));
         camera.setY(camera.getY() + (curY - oldY));
 
+        System.out.println("dragging: from " + oldX + ", " + oldY + " to " + curX + ", " + curY);
+        System.out.println("\tCamera: " + camera.getX() + ", " + camera.getY());
         oldX = curX;
         oldY = curY;
-        System.out.println("asd");
     }
 
     @Override
@@ -65,12 +66,14 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mousePressed(MouseEvent e) {
-        System.out.println("pressed - " + oldX + ", " + oldY);
+        oldX = e.getX();
+        oldY = e.getY();
+        System.out.println("pressed - " + e.getX() + ", " + e.getY());
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("released");
+        System.out.println("released - " + e.getX() + ", " + e.getY());
     }
 
     @Override

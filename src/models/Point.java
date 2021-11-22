@@ -36,11 +36,9 @@ public class Point implements Shape {
         this.z = z;
     }
 
+    // Конструктор копирования
     public Point(Point p) {
-        this.x = p.x;
-        this.y = p.y;
-        this.z = p.z;
-        this.nameID = p.nameID;
+        this(p.nameID, p.x, p.y, p.z);
     }
 
     // ----- Геттеры и Сеттеры ----- //
@@ -75,6 +73,11 @@ public class Point implements Shape {
 
     public void setNameID(String nameID) {
         this.nameID = nameID;
+    }
+
+
+    public Point deepCopy() {
+        return new Point(this);
     }
 
     @Override

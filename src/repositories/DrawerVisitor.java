@@ -3,26 +3,54 @@ package repositories;
 import models.*;
 import models.Point;
 import models.Polygon;
-import repositories.DrawVisitor;
 
 import java.awt.*;
 
-public class DrawerVisitor extends DrawVisitor {
+public class DrawerVisitor implements Visitor {
+    protected Graphics canvas;
+    protected Camera camera;
 
     private double zBuffer[][];
 
-    public DrawerVisitor() {
+    private double width;
+    private double height;
+
+    public DrawerVisitor(int width, int height) {
         super();
-        zBuffer = new double[1280][800];
+        this.setSize(width, height);
     }
 
-    public DrawerVisitor(Graphics canvas) {
-        super(canvas);
-        zBuffer = new double[1280][800];
+    public DrawerVisitor(Dimension dim) {
+        super();
+        this.setSize(dim);
+    }
+
+    public void setCanvas(Graphics canvas) {
+        this.canvas = canvas;
+    }
+
+    public void setCamera(Camera camera) {
+        this.camera = camera;
+    }
+
+    public void setSize(Dimension dim) {
+        this.setSize(dim.width, dim.height);
+    }
+
+    public void setSize(int width, int height) {
+        if (this.width < width || this.height < height) {
+            zBuffer = new double[width][height];
+        }
+        this.width = width;
+        this.height = height;
     }
 
     public void clearBuffer() {
-        zBuffer = new double[1280][800];
+        for (int i = 0; i < width; i++) {
+            for (int k = 0; k < height; k++) {
+                zBuffer[i][k] = Integer.MIN_VALUE;
+            }
+        }
     }
 
     private double[] interpolate(double i0, double d0, double i1, double d1) {
@@ -58,12 +86,15 @@ public class DrawerVisitor extends DrawVisitor {
                 p2 = temp;
             }
 
-            double[] values = interpolate(p1.x, p1.y, p2.x, p2.y);
+            double[] valuesY = interpolate(p1.x, p1.y, p2.x, p2.y);
+            double[] valuesZ = interpolate(p1.x, p1.z, p2.x, p2.z);
             int i = 0;
             for (double x = p1.x; x <= p2.x; x++, i++) {
                 int xt = (int) x;
-                int y = (int) values[i];
-                canvas.drawLine(xt, y, xt, y);
+                int y = (int) valuesY[i];
+                int z = (int) valuesZ[i];
+//                canvas.drawLine(xt, y, xt, y);
+                drawPixel(xt, y, z);
             }
         } else {
             if (p1.y > p2.y) {
@@ -72,15 +103,28 @@ public class DrawerVisitor extends DrawVisitor {
                 p2 = temp;
             }
 
-            double[] values = interpolate(p1.y, p1.x, p2.y, p2.x);
+            double[] valuesY = interpolate(p1.y, p1.x, p2.y, p2.x);
+            double[] valuesZ = interpolate(p1.y, p1.z, p2.y, p2.z);
             int i = 0;
             for (double y = p1.y; y <= p2.y; y++, i++) {
                 int yt = (int) y;
-                int x = (int) values[i];
-                canvas.drawLine(x, yt, x, yt);
+                int x = (int) valuesY[i];
+                int z = (int) valuesZ[i];
+//                canvas.drawLine(x, yt, x, yt);
+                drawPixel(x, yt, z);
             }
         }
 //         */
+    }
+
+    private void drawPixel(int x, int y, int z) {
+        if (x >= width || x < 0 || y >= height || y < 0) {
+            return;
+        }
+        if (zBuffer[x][y] < z) {
+            zBuffer[x][y] = z;
+            canvas.drawLine(x, y, x, y);
+        }
     }
 
     private void transformPointCamera(Point p) {
@@ -92,8 +136,8 @@ public class DrawerVisitor extends DrawVisitor {
         p.x = p.x * camera.getScreenDistance() / p.z;
         p.z = camera.getScreenDistance();
 
-        p.x += (int)(camera.getScreenWidth() / 2);
-        p.y = (int)(camera.getScreenHeight() / 2) - p.y;
+        p.x += (int) (camera.getScreenWidth() / 2);
+        p.y = (int) (camera.getScreenHeight() / 2) - p.y;
     }
 
     @Override

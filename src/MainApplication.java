@@ -84,7 +84,7 @@ public class MainApplication extends JFrame {
 
         sceneController = new SceneController(new SceneRepository());
 
-        drawController = new DrawController(new DrawerVisitor());
+        drawController = new DrawController(new DrawerVisitor(canvas.getSize()));
 
         canvas.setSceneRepository(sceneController.getSceneRepository());
 

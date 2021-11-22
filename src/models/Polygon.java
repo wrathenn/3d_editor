@@ -74,6 +74,13 @@ public class Polygon implements Shape {
         edges.remove(min);
     }
 
+    public Polygon deepCopy() {
+        ArrayList<Edge> newEdges = new ArrayList<>();
+        for (Edge e: edges) {
+            newEdges.add(e.deepCopy());
+        }
+        return new Polygon(newEdges);
+    }
 
     @Override
     public void accept(Visitor visitor) {
