@@ -5,31 +5,11 @@ import repositories.Visitor;
 import java.util.Objects;
 
 public class Edge implements Shape {
-    private Point begin;
-    private Point end;
-
-    Edge() {
-    }
+    public Point begin;
+    public Point end;
 
     public Edge(Point begin, Point end) {
         this.begin = begin;
-        this.end = end;
-    }
-
-    Point[] getDots() {
-        return new Point[]{begin, end};
-    }
-
-    void setDots(Point begin, Point end) {
-        this.begin = begin;
-        this.end = end;
-    }
-
-    void setBegin(Point begin) {
-        this.begin = begin;
-    }
-
-    void setEnd(Point end) {
         this.end = end;
     }
 
@@ -41,19 +21,13 @@ public class Edge implements Shape {
         return end;
     }
 
-    public boolean has(Point p) {
-        if (Objects.equals(p, begin) || Objects.equals(p, end)) {
-            return true;
-        }
-        return false;
-    }
-
-    public Edge deepCopy() {
-        return new Edge(begin.deepCopy(), end.deepCopy());
-    }
-
     @Override
     public void accept(Visitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public String toString() {
+        return "Edge\n\tpBegin:\t" + begin.toString() + "\n\tpEnd:\t" + end.toString();
     }
 }

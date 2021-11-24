@@ -120,21 +120,6 @@ public class SceneRepository {
         throw new NotExistedNameException("Не существует точки с именем" + name);
     }
 
-    public ArrayList<Polygon> find(Point p) {
-        ArrayList<Polygon> found = new ArrayList<>();
-
-        for (Polygon current : polygons) {
-            for (Edge e : current.getEdges()) {
-                if (Objects.equals(p, e.getBegin()) || Objects.equals(p, e.getEnd())) {
-                    found.add(current);
-                    break;
-                }
-            }
-        }
-
-        return found;
-    }
-
     public void delete(Point p) {
         System.out.println("Удаление точки " + p.toString());
     }

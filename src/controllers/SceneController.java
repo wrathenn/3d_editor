@@ -67,7 +67,9 @@ public class SceneController {
 //        shapes.addAll(edges);
 
         ArrayList<Polygon> polygons = sceneRepository.getPolygons();
-        shapes.addAll(polygons);
+        for (Polygon p: polygons) {
+            shapes.add(p.deepCopy());
+        }
 
         return shapes;
     }

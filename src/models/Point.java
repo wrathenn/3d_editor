@@ -3,7 +3,7 @@ package models;
 import repositories.Visitor;
 
 public class Point implements Shape {
-    String nameID;
+    public String nameID;
     public double x;
     public double y;
     public double z;
@@ -83,5 +83,16 @@ public class Point implements Shape {
     @Override
     public void accept(Visitor visitor) {
         visitor.visit(this);
+    }
+
+    public static void swap(Point p1, Point p2) {
+        Point temp = p1;
+        p1 = p2;
+        p2 = temp;
+    }
+
+    @Override
+    public String toString() {
+        return "Point " + this.nameID + ", x: " + this.x + ", y: " + this.y +", z: " + this.z;
     }
 }

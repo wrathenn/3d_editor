@@ -5,6 +5,10 @@ import models.Point;
 import models.Polygon;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class DrawerVisitor implements Visitor {
     protected Graphics canvas;
@@ -127,7 +131,8 @@ public class DrawerVisitor implements Visitor {
         }
     }
 
-    private void transformPointCamera(Point p) {
+    public void transformPointCamera(PointDraw point) {
+        Point p = point.point;
         p.x -= camera.getX();
         p.y -= camera.getY();
         p.z -= camera.getZ();
@@ -142,7 +147,7 @@ public class DrawerVisitor implements Visitor {
 
     @Override
     public void visit(Point p) {
-        transformPointCamera(p);
+//        transformPointCamera(p);
 
         canvas.drawOval((int) p.x, (int) p.y, 2, 2);
         canvas.drawString(p.getNameID(), (int) p.x - 2, (int) p.y - 2);
@@ -168,9 +173,32 @@ public class DrawerVisitor implements Visitor {
 
     @Override
     public void visit(Polygon p) {
+        // Преобразование по камере
+        // В каждом ребре точка начала будет выше по Y
         for (Edge e : p.getEdges()) {
-            this.visit(e);
+            Point pBegin = e.getBegin();
+            Point pEnd = e.getEnd();
+
+            transformPointCamera(pBegin);
+            transformPointCamera(pEnd);
+
+            if (pBegin.getY() < pEnd.getY()) {
+                Point.swap(pBegin, pEnd);
+            }
         }
+
+        // Отсортировать ребра по убыванию Y начала ребра
+        ArrayList<Edge> edges = new ArrayList<>(p.getEdges());
+        edges.sort((a, b) -> {
+            if (a.getBegin().getY() > b.getBegin().getY()) {
+                return -1;
+            } else if (a.getBegin().getY() < b.getBegin().getY()) {
+                return 1;
+            }
+            return 0;
+        });
+
+        // Найти нормаль в каждой точке по той формуле
 
         System.out.println("Drawing Polygon");
     }

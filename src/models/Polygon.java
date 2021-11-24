@@ -1,5 +1,6 @@
 package models;
 
+import libs.SharedFunctions;
 import repositories.Visitor;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class Polygon implements Shape {
-    private ArrayList<Edge> edges;
+    protected ArrayList<Edge> edges;
 
     public Polygon() {
         this.edges = new ArrayList<Edge>();
@@ -60,8 +61,7 @@ public class Polygon implements Shape {
             Edge e = edges.get(i);
             if (Objects.equals(e.getBegin(), p)) {
                 onBeginIndex = i;
-            }
-            else if (Objects.equals(e.getEnd(), p)) {
+            } else if (Objects.equals(e.getEnd(), p)) {
                 onEndIndex = i;
             }
         }
@@ -72,14 +72,6 @@ public class Polygon implements Shape {
         edges.remove(max);
         edges.add(max, newEdge);
         edges.remove(min);
-    }
-
-    public Polygon deepCopy() {
-        ArrayList<Edge> newEdges = new ArrayList<>();
-        for (Edge e: edges) {
-            newEdges.add(e.deepCopy());
-        }
-        return new Polygon(newEdges);
     }
 
     @Override
