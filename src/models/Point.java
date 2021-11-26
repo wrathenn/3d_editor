@@ -47,7 +47,7 @@ public class Point implements Shape {
         return x;
     }
 
-    public void setX(float x) {
+    public void setX(double x) {
         this.x = x;
     }
 
@@ -55,7 +55,7 @@ public class Point implements Shape {
         return y;
     }
 
-    public void setY(float y) {
+    public void setY(double y) {
         this.y = y;
     }
 
@@ -63,7 +63,7 @@ public class Point implements Shape {
         return z;
     }
 
-    public void setZ(float z) {
+    public void setZ(double z) {
         this.z = z;
     }
 
@@ -75,9 +75,27 @@ public class Point implements Shape {
         this.nameID = nameID;
     }
 
+    public double vectorLen() {
+        return Math.sqrt(x * x + y * y + z * z);
+    }
 
-    public Point deepCopy() {
-        return new Point(this);
+    public Point makeUnitVector() {
+        double len = vectorLen();
+        x /= len;
+        y /= len;
+        z /= len;
+        return this;
+    }
+
+    public Point minus(Point p) {
+        x -= p.x;
+        y -= p.y;
+        z -= p.z;
+        return this;
+    }
+
+    public static Point multiplyOneByOne(Point p1, Point p2) {
+        return new Point(p1.x * p2.x, p1.y * p2.y, p1.z * p2.z);
     }
 
     @Override
@@ -93,6 +111,6 @@ public class Point implements Shape {
 
     @Override
     public String toString() {
-        return "Point " + this.nameID + ", x: " + this.x + ", y: " + this.y +", z: " + this.z;
+        return "Point " + this.nameID + ", x: " + this.x + ", y: " + this.y + ", z: " + this.z;
     }
 }

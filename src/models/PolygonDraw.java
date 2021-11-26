@@ -6,6 +6,15 @@ import java.util.ArrayList;
 
 public class PolygonDraw {
     public Point normalLine;
+
+    public ArrayList<EdgeDraw> getEdges() {
+        return edges;
+    }
+
+    public void setEdges(ArrayList<EdgeDraw> edges) {
+        this.edges = edges;
+    }
+
     private ArrayList<EdgeDraw> edges;
 
     public PolygonDraw(ArrayList<EdgeDraw> edges) {

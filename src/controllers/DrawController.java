@@ -89,18 +89,42 @@ public class DrawController {
     }
 
     private void drawPreprocessing(ArrayList<PointDraw> points,
-                                   ArrayList<EdgeDraw> edges,
                                    ArrayList<PolygonDraw> polygons) {
 
         for (PolygonDraw poly : polygons) {
             poly.findNormalLine();
         }
+
         for (PointDraw p : points) {
             drawerVisitor.transformPointCamera(p);
+            drawerVisitor.findViewerVector(p);
         }
+
 
         for (PolygonDraw p : polygons) {
              p.findNormalLine();
+            // Найти цвет каждой точки, не находить, если уже найдет
+             for (EdgeDraw e : p.getEdges()) {
+                 if (e.begin.intensity == null) {
+                    drawerVisitor.findPointColor(e.begin, p.normalLine);
+                 }
+                 if (e.end.intensity == null) {
+                     drawerVisitor.findPointColor(e.end, p.normalLine);
+                 }
+             }
+
+             // Отрисовка полигона
+
+
+            // Очистить цвет каждой точки
+            for (EdgeDraw e : p.getEdges()) {
+                if (e.begin.intensity != null) {
+                    e.begin.intensity = null;
+                }
+                if (e.end.intensity != null) {
+                    e.end.intensity = null;
+                }
+            }
         }
     }
 

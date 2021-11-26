@@ -6,15 +6,15 @@ import models.Polygon;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class DrawerVisitor implements Visitor {
     protected Graphics canvas;
     protected Camera camera;
 
     private double zBuffer[][];
+
+    private final Intensity diffusionI = new Intensity(0.3, 0.3, 0.3);
+    private final Intensity backGroundI = new Intensity(0.2, 0.2, 0.2);
 
     private double width;
     private double height;
@@ -82,18 +82,18 @@ public class DrawerVisitor implements Visitor {
 //        canvas.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
 //        /*
         canvas.setColor(Color.GREEN);
-        if (Math.abs(p2.x - p1.x) > Math.abs(p2.y - p1.y)) {
+        if (Math.abs(p2.getX() - p1.getX()) > Math.abs(p2.getY() - p1.getY())) {
             // Прямая ближе к горизонтальной
-            if (p1.x > p2.x) {
+            if (p1.getX() > p2.getX()) {
                 Point temp = p1;
                 p1 = p2;
                 p2 = temp;
             }
 
-            double[] valuesY = interpolate(p1.x, p1.y, p2.x, p2.y);
-            double[] valuesZ = interpolate(p1.x, p1.z, p2.x, p2.z);
+            double[] valuesY = interpolate(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+            double[] valuesZ = interpolate(p1.getX(), p1.getZ(), p2.getX(), p2.getZ());
             int i = 0;
-            for (double x = p1.x; x <= p2.x; x++, i++) {
+            for (double x = p1.getX(); x <= p2.getX(); x++, i++) {
                 int xt = (int) x;
                 int y = (int) valuesY[i];
                 int z = (int) valuesZ[i];
@@ -101,16 +101,16 @@ public class DrawerVisitor implements Visitor {
                 drawPixel(xt, y, z);
             }
         } else {
-            if (p1.y > p2.y) {
+            if (p1.getY() > p2.getY()) {
                 Point temp = p1;
                 p1 = p2;
                 p2 = temp;
             }
 
-            double[] valuesY = interpolate(p1.y, p1.x, p2.y, p2.x);
-            double[] valuesZ = interpolate(p1.y, p1.z, p2.y, p2.z);
+            double[] valuesY = interpolate(p1.getY(), p1.getX(), p2.getY(), p2.getX());
+            double[] valuesZ = interpolate(p1.getY(), p1.getZ(), p2.getY(), p2.getZ());
             int i = 0;
-            for (double y = p1.y; y <= p2.y; y++, i++) {
+            for (double y = p1.getY(); y <= p2.getY(); y++, i++) {
                 int yt = (int) y;
                 int x = (int) valuesY[i];
                 int z = (int) valuesZ[i];
@@ -133,24 +133,39 @@ public class DrawerVisitor implements Visitor {
 
     public void transformPointCamera(PointDraw point) {
         Point p = point.point;
-        p.x -= camera.getX();
-        p.y -= camera.getY();
-        p.z -= camera.getZ();
+        p.setX(p.getX() - camera.getX());
+        p.setY(p.getY() - camera.getY());
+        p.setZ(p.getZ() - camera.getZ());
 
-        p.y = p.y * camera.getScreenDistance() / p.z;
-        p.x = p.x * camera.getScreenDistance() / p.z;
-        p.z = camera.getScreenDistance();
+        p.setY(p.getY() * camera.getScreenDistance() / p.getZ());
+        p.setX(p.getX() * camera.getScreenDistance() / p.getZ());
+        p.setZ(camera.getScreenDistance());
 
-        p.x += (int) (camera.getScreenWidth() / 2);
-        p.y = (int) (camera.getScreenHeight() / 2) - p.y;
+        p.setX((int) (p.getX() + (camera.getScreenWidth() / 2)));
+        p.setY((int) (camera.getScreenHeight() / 2 - p.getY()));
+    }
+
+    public void findViewerVector(PointDraw point) {
+        Point viewVector = new Point(
+                point.getX() - camera.getX(),
+                point.getY() - camera.getY(),
+                point.getZ() - camera.getZ()
+        ).makeUnitVector();
+        point.setViewerVector(viewVector);
+    }
+
+    public void findPointColor(PointDraw point, Point polyNormal) {
+        Point diffusionVector = Point.multiplyOneByOne(point.viewerVector, polyNormal);
+        Intensity curI = Intensity.multiplyVector(diffusionI, diffusionVector);
+        curI.add(backGroundI);
     }
 
     @Override
     public void visit(Point p) {
 //        transformPointCamera(p);
 
-        canvas.drawOval((int) p.x, (int) p.y, 2, 2);
-        canvas.drawString(p.getNameID(), (int) p.x - 2, (int) p.y - 2);
+        canvas.drawOval((int) p.getX(), (int) p.getY(), 2, 2);
+        canvas.drawString(p.getNameID(), (int) p.getX() - 2, (int) p.getY() - 2);
 
         System.out.println("Drawing point");
     }
@@ -179,8 +194,8 @@ public class DrawerVisitor implements Visitor {
             Point pBegin = e.getBegin();
             Point pEnd = e.getEnd();
 
-            transformPointCamera(pBegin);
-            transformPointCamera(pEnd);
+//            transformPointCamera(pBegin);
+//            transformPointCamera(pEnd);
 
             if (pBegin.getY() < pEnd.getY()) {
                 Point.swap(pBegin, pEnd);
