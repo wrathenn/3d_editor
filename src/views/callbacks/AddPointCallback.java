@@ -1,7 +1,7 @@
 package views.callbacks;
 
-import models.Shape;
+import models.Point;
 
 public interface AddPointCallback {
-    void callback(Shape s);
+    void callback(Point p);
 }

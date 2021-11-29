@@ -50,4 +50,10 @@ public class PointDraw {
     public Point getViewerVector() {
         return viewerVector;
     }
+
+    public static void swap(PointDraw p1, PointDraw p2) {
+        PointDraw pt = p1;
+        p1 = p2;
+        p2 = pt;
+    }
 }

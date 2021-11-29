@@ -1,17 +1,22 @@
 package repositories;
 
+import libs.SharedFunctions;
+import libs.SortedLinkedList;
 import models.*;
 import models.Point;
 import models.Polygon;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
-public class DrawerVisitor implements Visitor {
+public class DrawerZBuffer {
     protected Graphics canvas;
     protected Camera camera;
 
-    private double zBuffer[][];
+    private double[][] zBuffer;
 
     private final Intensity diffusionI = new Intensity(0.3, 0.3, 0.3);
     private final Intensity backGroundI = new Intensity(0.2, 0.2, 0.2);
@@ -19,12 +24,12 @@ public class DrawerVisitor implements Visitor {
     private double width;
     private double height;
 
-    public DrawerVisitor(int width, int height) {
+    public DrawerZBuffer(int width, int height) {
         super();
         this.setSize(width, height);
     }
 
-    public DrawerVisitor(Dimension dim) {
+    public DrawerZBuffer(Dimension dim) {
         super();
         this.setSize(dim);
     }
@@ -158,9 +163,9 @@ public class DrawerVisitor implements Visitor {
         Point diffusionVector = Point.multiplyOneByOne(point.viewerVector, polyNormal);
         Intensity curI = Intensity.multiplyVector(diffusionI, diffusionVector);
         curI.add(backGroundI);
+        point.intensity = curI;
     }
 
-    @Override
     public void visit(Point p) {
 //        transformPointCamera(p);
 
@@ -170,7 +175,6 @@ public class DrawerVisitor implements Visitor {
         System.out.println("Drawing point");
     }
 
-    @Override
     public void visit(Edge e) {
         Point begin = new Point(e.getBegin());
         Point end = new Point(e.getEnd());
@@ -186,7 +190,6 @@ public class DrawerVisitor implements Visitor {
         System.out.println("Drawing edge");
     }
 
-    @Override
     public void visit(Polygon p) {
         // Преобразование по камере
         // В каждом ребре точка начала будет выше по Y
@@ -216,5 +219,110 @@ public class DrawerVisitor implements Visitor {
         // Найти нормаль в каждой точке по той формуле
 
         System.out.println("Drawing Polygon");
+    }
+
+
+    static class EdgeDrawInfo {
+        public double lenY;
+        public double x;
+        public double z;
+        public double yBegin;
+        public Intensity currentI;
+        public Intensity dI;
+        public double dx;
+        public double dz;
+
+        public EdgeDrawInfo(EdgeDraw edge) {
+            PointDraw pBegin = edge.begin;
+            PointDraw pEnd = edge.end;
+            if (pBegin.getY() < pEnd.getY()) {
+                PointDraw.swap(pBegin, pEnd);
+            }
+
+            lenY = pBegin.getY() - pEnd.getY();
+            x = pBegin.getX();
+            yBegin = pBegin.getY();
+            z = pBegin.getZ();
+            currentI = new Intensity(pBegin.intensity);
+            dI = new Intensity(pEnd.intensity).minus(currentI).divide(lenY);
+            dx = (pEnd.getX() - pBegin.getX()) / lenY;
+            dz = (pEnd.getZ() - pBegin.getZ()) / lenY;
+        }
+    }
+
+    static class XZElement {
+        public double x;
+        public double z;
+        public Intensity intensity;
+
+        public XZElement(EdgeDrawInfo edgeInfo) {
+            x = edgeInfo.x;
+            z = edgeInfo.z;
+            intensity = new Intensity(edgeInfo.currentI);
+        }
+    }
+
+    public void drawPolygon(PolygonDraw poly) {
+        //
+        SortedLinkedList<EdgeDrawInfo> infoList = new SortedLinkedList<>((o1, o2) ->
+                SharedFunctions.doubleCompare(o2.yBegin, o1.yBegin));
+        LinkedList<EdgeDrawInfo> activeList = new LinkedList<>();
+
+        // В каждом ребре начало будет выше по Y, чем конец
+        for (EdgeDraw e : poly.getEdges()) {
+            if (e.begin.getY() < e.end.getY()) {
+                PointDraw.swap(e.begin, e.end);
+            }
+            infoList.add(new EdgeDrawInfo(e));
+        }
+
+        double currentY = infoList.getFirst().yBegin;
+        while (infoList.size() != 0 || activeList.size() != 0) {
+            // Пока в infoList в начале содержится ребро, у которого y_верх≥curY: добавить это ребро в activeList
+            while (infoList.getFirst().yBegin >= currentY) {
+                try {
+                    activeList.add(infoList.pop());
+                } catch (NoSuchElementException e) {
+                    break;
+                }
+            }
+
+            SortedLinkedList<XZElement> xzList = new SortedLinkedList<>((o1, o2) ->
+                    SharedFunctions.doubleCompare(o1.x, o2.x));
+            // Сформировать массив currentXZ на основе activeList
+            for (EdgeDrawInfo edgeInfo : activeList) {
+                xzList.add(new XZElement(edgeInfo));
+            }
+
+            while (xzList.size() != 0) {
+                XZElement xzBegin = xzList.pop();
+                XZElement xzEnd = xzList.pop();
+
+                double dz = (xzEnd.z - xzBegin.z) / (xzEnd.x / xzBegin.x);
+                Intensity dI = xzEnd.intensity.minus(xzBegin.intensity).divide(xzEnd.x / xzBegin.x);
+
+                while (xzBegin.x < xzEnd.x) {
+                    if (zBuffer[(int) xzBegin.x][(int) currentY] < xzBegin.z) {
+                        zBuffer[(int) xzBegin.x][(int) currentY] = xzBegin.z;
+                        canvas.drawLine((int) xzBegin.x, (int) currentY, (int) xzBegin.x, (int) currentY);
+                    }
+                    xzBegin.x++;
+                    xzBegin.z += dz;
+                    xzBegin.intensity.add(dI);
+                }
+            }
+
+            for (EdgeDrawInfo edgeInfo : activeList) {
+                edgeInfo.x += edgeInfo.dx;
+                edgeInfo.z += edgeInfo.dz;
+                edgeInfo.yBegin -= 1;
+                edgeInfo.currentI.add(edgeInfo.dI);
+                if (edgeInfo.yBegin < 0) {
+                    activeList.remove(edgeInfo);
+                }
+            }
+
+            currentY--;
+        }
     }
 }

@@ -21,33 +21,50 @@ public class SceneRepository {
     // ----- Конструкторы ----- //
 
     public SceneRepository() {
-        points = new ArrayList<>(Arrays.asList(
-                new Point("M1", -50, 50, 0),
-                new Point("M2", 50, 50, 0),
-                new Point("M3", 50, -50, 0),
-                new Point("M4", -50, -50, 0),
-                new Point("M5", -50, 50, 100),
-                new Point("M6", 50, 50, 100),
-                new Point("M7", 50, -50, 100),
-                new Point("M8", -50, -50, 100)
-        ));
+        points = new ArrayList<>();
+        {
+//            // Кубик
+//            points.add(new Point("M1", -50, 50, 0));
+//            points.add(new Point("M2", 50, 50, 0));
+//            points.add(new Point("M3", 50, -50, 0));
+//            points.add(new Point("M4", -50, -50, 0));
+//            points.add(new Point("M5", -50, 50, 100));
+//            points.add(new Point("M6", 50, 50, 100));
+//            points.add(new Point("M7", 50, -50, 100));
+//            points.add(new Point("M8", -50, -50, 100));
+            // пирамидка
+            points.add(new Point("M1", 0, 50, 0));
+            points.add(new Point("M1", -40, 0, -40));
+            points.add(new Point("M1", 30, -10, -30));
+            points.add(new Point("M1", 10, -20, 10));
+        }
         edges = new ArrayList<>();
         {
+//            // Кубик
+//            edges.add(new Edge(points.get(0), points.get(1)));
+//            edges.add(new Edge(points.get(1), points.get(2)));
+//            edges.add(new Edge(points.get(2), points.get(3)));
+//            edges.add(new Edge(points.get(3), points.get(0)));
+//
+//            edges.add(new Edge(points.get(0), points.get(4)));
+//            edges.add(new Edge(points.get(1), points.get(5)));
+//            edges.add(new Edge(points.get(2), points.get(6)));
+//            edges.add(new Edge(points.get(3), points.get(7)));
+//
+//
+//            edges.add(new Edge(points.get(4), points.get(5)));
+//            edges.add(new Edge(points.get(5), points.get(6)));
+//            edges.add(new Edge(points.get(6), points.get(7)));
+//            edges.add(new Edge(points.get(7), points.get(4)));
+
             edges.add(new Edge(points.get(0), points.get(1)));
+            edges.add(new Edge(points.get(0), points.get(2)));
+            edges.add(new Edge(points.get(0), points.get(3)));
+
             edges.add(new Edge(points.get(1), points.get(2)));
+            edges.add(new Edge(points.get(1), points.get(3)));
+
             edges.add(new Edge(points.get(2), points.get(3)));
-            edges.add(new Edge(points.get(3), points.get(0)));
-
-            edges.add(new Edge(points.get(0), points.get(4)));
-            edges.add(new Edge(points.get(1), points.get(5)));
-            edges.add(new Edge(points.get(2), points.get(6)));
-            edges.add(new Edge(points.get(3), points.get(7)));
-
-
-            edges.add(new Edge(points.get(4), points.get(5)));
-            edges.add(new Edge(points.get(5), points.get(6)));
-            edges.add(new Edge(points.get(6), points.get(7)));
-            edges.add(new Edge(points.get(7), points.get(4)));
         }
         polygons = new ArrayList<>();
         {

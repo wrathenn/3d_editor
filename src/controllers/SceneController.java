@@ -29,49 +29,28 @@ public class SceneController {
 
     // ----- Методы ----- //
 
-    public void add(Shape shape) throws ExistedNameException {
-        if (shape instanceof Point) {
-            sceneRepository.add((Point) shape);
-        } else if (shape instanceof Edge) {
-            sceneRepository.add((Edge) shape);
-        } else if (shape instanceof Polygon) {
-            sceneRepository.add((Polygon) shape);
-        } else if (shape instanceof Camera) {
-            sceneRepository.add((Camera) shape);
-        }
+    public void add(Point p) throws ExistedNameException {
+        sceneRepository.add(p);
     }
 
-    public void delete(Shape shape) {
-        if (shape instanceof Point) {
-            sceneRepository.delete((Point) shape);
-        } else if (shape instanceof Edge) {
-            sceneRepository.delete((Edge) shape);
-        } else if (shape instanceof Polygon) {
-            sceneRepository.delete((Polygon) shape);
-        } else if (shape instanceof Camera) {
-            sceneRepository.delete((Camera) shape);
-        }
+    public void add(Edge e) {
+        sceneRepository.add(e);
     }
 
-    public ArrayList<Shape> getShapesToDraw() {
-        ArrayList<Shape> shapes = new ArrayList<>();
+    public void add(Polygon p) {
+        sceneRepository.add(p);
+    }
 
-//        ArrayList<Point> points = sceneRepository.getPoints();
-//        for (Point p : points) {
-//            if (p.getNameID().charAt(0) == 't') {
-//                shapes.add(p);
-//            }
-//        }
-//
-//        ArrayList<Edge> edges = sceneRepository.getEdges();
-//        shapes.addAll(edges);
+    public void delete(Point p) {
+        sceneRepository.delete(p);
+    }
 
-//        ArrayList<Polygon> polygons = sceneRepository.getPolygons();
-//        for (Polygon p: polygons) {
-//            shapes.add(p.deepCopy());
-//        }
+    public void delete(Edge e) {
+        sceneRepository.delete(e);
+    }
 
-        return shapes;
+    public void delete(Polygon p) {
+        sceneRepository.delete(p);
     }
 
     public Point findPoint(String name) throws NotExistedNameException {

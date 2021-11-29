@@ -11,10 +11,31 @@ public class Intensity {
         blueI = b;
     }
 
-    public void add(Intensity i) {
+    public Intensity(Intensity i) {
+        redI = i.redI;
+        greenI = i.greenI;
+        blueI = i.blueI;
+    }
+
+    public Intensity add(Intensity i) {
         redI += i.redI;
         greenI += i.greenI;
         blueI += i.blueI;
+        return this;
+    }
+
+    public Intensity minus(Intensity i) {
+        redI -= i.redI;
+        greenI -= i.greenI;
+        blueI -= i.blueI;
+        return this;
+    }
+
+    public Intensity divide(double n) {
+        redI /= n;
+        greenI /= n;
+        blueI /= n;
+        return this;
     }
 
     public static Intensity multiplyVector(Intensity i, Point p) {
@@ -24,4 +45,5 @@ public class Intensity {
                 i.blueI *= p.z
         );
     }
+
 }

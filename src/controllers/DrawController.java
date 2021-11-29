@@ -4,29 +4,31 @@ import models.*;
 import models.Point;
 import models.Polygon;
 import org.jetbrains.annotations.Nullable;
-import repositories.DrawerVisitor;
+import repositories.DrawerZBuffer;
 import repositories.SceneRepository;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class DrawController {
 
-    private DrawerVisitor drawerVisitor;
+    private DrawerZBuffer drawerVisitor;
 
     // ----- Конструкторы ----- //
 
     public DrawController() {
     }
 
-    public DrawController(DrawerVisitor drawerVisitor) {
+    public DrawController(DrawerZBuffer drawerVisitor) {
         this.drawerVisitor = drawerVisitor;
     }
 
     // ----- Сеттеры и Геттеры ----- //
 
-    public void setDrawerVisitor(DrawerVisitor drawerVisitor) {
+    public void setDrawerVisitor(DrawerZBuffer drawerVisitor) {
         this.drawerVisitor = drawerVisitor;
     }
 
@@ -88,6 +90,28 @@ public class DrawController {
         }
     }
 
+    private void findPointsColorInPolygon(PolygonDraw p) {
+        for (EdgeDraw e : p.getEdges()) {
+            if (e.begin.intensity == null) {
+                drawerVisitor.findPointColor(e.begin, p.normalLine);
+            }
+            if (e.end.intensity == null) {
+                drawerVisitor.findPointColor(e.end, p.normalLine);
+            }
+        }
+    }
+
+    private void clearPointsColorInPolygon(PolygonDraw p) {
+        for (EdgeDraw e : p.getEdges()) {
+            if (e.begin.intensity != null) {
+                e.begin.intensity = null;
+            }
+            if (e.end.intensity != null) {
+                e.end.intensity = null;
+            }
+        }
+    }
+
     private void drawPreprocessing(ArrayList<PointDraw> points,
                                    ArrayList<PolygonDraw> polygons) {
 
@@ -100,33 +124,19 @@ public class DrawController {
             drawerVisitor.findViewerVector(p);
         }
 
-
-        for (PolygonDraw p : polygons) {
-             p.findNormalLine();
+        for (PolygonDraw poly : polygons) {
+            poly.findNormalLine();
             // Найти цвет каждой точки, не находить, если уже найдет
-             for (EdgeDraw e : p.getEdges()) {
-                 if (e.begin.intensity == null) {
-                    drawerVisitor.findPointColor(e.begin, p.normalLine);
-                 }
-                 if (e.end.intensity == null) {
-                     drawerVisitor.findPointColor(e.end, p.normalLine);
-                 }
-             }
+            findPointsColorInPolygon(poly);
 
-             // Отрисовка полигона
-
+            // Отрисовка полигона
+            drawerVisitor.drawPolygon(poly);
 
             // Очистить цвет каждой точки
-            for (EdgeDraw e : p.getEdges()) {
-                if (e.begin.intensity != null) {
-                    e.begin.intensity = null;
-                }
-                if (e.end.intensity != null) {
-                    e.end.intensity = null;
-                }
-            }
+            clearPointsColorInPolygon(poly);
         }
     }
+
 
     public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
         canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
@@ -138,8 +148,11 @@ public class DrawController {
         drawerVisitor.setCanvas(canvas);
         drawerVisitor.setCamera(camera);
 
-//        for (Shape s : shapes) {
-//            s.accept(drawerVisitor);
-//        }
+        ArrayList<PointDraw> pointsToDraw = new ArrayList<>();
+        ArrayList<EdgeDraw> edgesToDraw = new ArrayList<>();
+        ArrayList<PolygonDraw> polygonsToDraw = new ArrayList<>();
+
+        drawCopy(sceneRepository, pointsToDraw, edgesToDraw, polygonsToDraw);
+        drawPreprocessing(pointsToDraw, polygonsToDraw);
     }
 }

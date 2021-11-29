@@ -1,10 +1,6 @@
 package models;
 
-import repositories.Visitor;
-
-import java.util.Objects;
-
-public class Edge implements Shape {
+public class Edge {
     public Point begin;
     public Point end;
 
@@ -19,11 +15,6 @@ public class Edge implements Shape {
 
     public Point getEnd() {
         return end;
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
     }
 
     @Override

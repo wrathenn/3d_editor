@@ -1,77 +1,33 @@
-abstract class AbstractA {
+import java.util.LinkedList;
 
-}
-
-class A {
-    private int a;
-    private int b;
-
-    public A() {
-    }
-
-    public A(int a1, int b1) {
-        a = a1;
-        b = b1;
-    }
-
-    public void setA(int a) {
-        this.a = a;
-    }
-
-    public void setB(int b) {
-        this.b = b;
-    }
-
-    public int getA() {
-        return a;
-    }
-
-    public int getB() {
-        return b;
-    }
-
+class DrawList extends LinkedList<Integer> {
     @Override
-    public String toString() {
-        return "A obj: a=" + this.a + ", b=" + this.b;
-    }
-}
+    public boolean add(Integer edge) {
+        if (this.size() == 0) {
+            super.addFirst(edge);
+            return true;
+        }
 
-class A1 extends A {
-    A a;
+        for (int i = 0; i < this.size(); i++) {
+            if (super.get(i) < edge) {
+                super.add(i, edge);
+                return true;
+            }
+        }
 
-    public A1(A a1) {
-        super(a1.getA(), a1.getB());
-        a = a1;
-    }
-
-    @Override
-    public int getA() {
-        return super.getA();
-    }
-    @Override
-    public int getB() {
-        return super.getB();
-    }
-    @Override
-    public void setA(int a) {
-        super.setA(a);
-    }
-    @Override
-    public void setB(int b) {
-        super.setB(b);
-    }
-    @Override
-    public String toString() {
-        return super.toString();
+        super.addLast(edge);
+        return true;
     }
 }
 
 public class Test {
     public static void main(String[] args) {
-        A testA = new A(1, 2);
-        System.out.println(testA);
-        A1 testA1 = new A1(testA);
-        System.out.println(testA1);
-        System.out.println(testA1.getB());
+        DrawList list = new DrawList();
+        list.add(1);
+        list.add(2);
+        list.add(-1);
+        for (Integer i : list) {
+            System.out.println(i);
+        }
     }
 }

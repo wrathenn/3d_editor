@@ -1,8 +1,6 @@
 package models;
 
-import repositories.Visitor;
-
-public class Point implements Shape {
+public class Point {
     public String nameID;
     public double x;
     public double y;
@@ -96,11 +94,6 @@ public class Point implements Shape {
 
     public static Point multiplyOneByOne(Point p1, Point p2) {
         return new Point(p1.x * p2.x, p1.y * p2.y, p1.z * p2.z);
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
     }
 
     public static void swap(Point p1, Point p2) {

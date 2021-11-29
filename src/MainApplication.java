@@ -7,7 +7,7 @@ import models.Edge;
 import models.Point;
 import models.Polygon;
 import repositories.SceneRepository;
-import repositories.DrawerVisitor;
+import repositories.DrawerZBuffer;
 import views.user_input.AddEdgeView;
 import views.user_input.AddPointView;
 import views.CanvasView;
@@ -84,7 +84,7 @@ public class MainApplication extends JFrame {
 
         sceneController = new SceneController(new SceneRepository());
 
-        drawController = new DrawController(new DrawerVisitor(canvas.getSize()));
+        drawController = new DrawController(new DrawerZBuffer(canvas.getSize()));
 
         canvas.setSceneRepository(sceneController.getSceneRepository());
 
@@ -120,11 +120,7 @@ public class MainApplication extends JFrame {
                     return; // TODO: errorView
                 }
 
-                try {
-                    sceneController.add(new Edge(p1, p2));
-                } catch (ExistedNameException ex) {
-                    System.out.println(ex.getMessage());
-                }
+                sceneController.add(new Edge(p1, p2));
             });
 
             frame.setVisible(true);
@@ -147,12 +143,7 @@ public class MainApplication extends JFrame {
                 Point[] pArr = new Point[points.size()];
                 Polygon newPoly = new Polygon(points.toArray(pArr));
 
-                try {
                     sceneController.add(newPoly);
-                } catch (ExistedNameException ex) {
-                    System.out.println(ex.getMessage());
-                    // TODO: errorView
-                }
             });
 
             frame.setVisible(true);

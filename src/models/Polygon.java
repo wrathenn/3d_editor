@@ -1,13 +1,10 @@
 package models;
 
-import libs.SharedFunctions;
-import repositories.Visitor;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Polygon implements Shape {
+public class Polygon {
     protected ArrayList<Edge> edges;
 
     public Polygon() {
@@ -72,10 +69,5 @@ public class Polygon implements Shape {
         edges.remove(max);
         edges.add(max, newEdge);
         edges.remove(min);
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visit(this);
     }
 }
