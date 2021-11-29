@@ -7,10 +7,7 @@ import models.Point;
 import models.Polygon;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class DrawerZBuffer {
     protected Graphics canvas;
@@ -236,7 +233,9 @@ public class DrawerZBuffer {
             PointDraw pBegin = edge.begin;
             PointDraw pEnd = edge.end;
             if (pBegin.getY() < pEnd.getY()) {
-                PointDraw.swap(pBegin, pEnd);
+                PointDraw temp = pBegin;
+                pBegin = pEnd;
+                pEnd = temp;
             }
 
             lenY = pBegin.getY() - pEnd.getY();
@@ -270,23 +269,19 @@ public class DrawerZBuffer {
 
         // В каждом ребре начало будет выше по Y, чем конец
         for (EdgeDraw e : poly.getEdges()) {
-            if (e.begin.getY() < e.end.getY()) {
-                PointDraw.swap(e.begin, e.end);
-            }
             infoList.add(new EdgeDrawInfo(e));
         }
 
         double currentY = infoList.getFirst().yBegin;
         while (infoList.size() != 0 || activeList.size() != 0) {
             // Пока в infoList в начале содержится ребро, у которого y_верх≥curY: добавить это ребро в activeList
-            while (infoList.getFirst().yBegin >= currentY) {
-                try {
+            try {
+                while (infoList.getFirst().yBegin >= currentY) {
                     activeList.add(infoList.pop());
-                } catch (NoSuchElementException e) {
-                    break;
                 }
+            } catch (NoSuchElementException e) {
+                break;
             }
-
             SortedLinkedList<XZElement> xzList = new SortedLinkedList<>((o1, o2) ->
                     SharedFunctions.doubleCompare(o1.x, o2.x));
             // Сформировать массив currentXZ на основе activeList

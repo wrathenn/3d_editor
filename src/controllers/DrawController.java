@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class DrawController {
-
     private DrawerZBuffer drawerVisitor;
 
     // ----- Конструкторы ----- //

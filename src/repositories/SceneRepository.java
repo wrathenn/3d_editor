@@ -32,11 +32,10 @@ public class SceneRepository {
 //            points.add(new Point("M6", 50, 50, 100));
 //            points.add(new Point("M7", 50, -50, 100));
 //            points.add(new Point("M8", -50, -50, 100));
-            // пирамидка
+            // треугольник
             points.add(new Point("M1", 0, 50, 0));
-            points.add(new Point("M1", -40, 0, -40));
-            points.add(new Point("M1", 30, -10, -30));
-            points.add(new Point("M1", 10, -20, 10));
+            points.add(new Point("M2", -40, 10, 10));
+            points.add(new Point("M3", 30, 0, 20));
         }
         edges = new ArrayList<>();
         {
@@ -59,12 +58,7 @@ public class SceneRepository {
 
             edges.add(new Edge(points.get(0), points.get(1)));
             edges.add(new Edge(points.get(0), points.get(2)));
-            edges.add(new Edge(points.get(0), points.get(3)));
-
             edges.add(new Edge(points.get(1), points.get(2)));
-            edges.add(new Edge(points.get(1), points.get(3)));
-
-            edges.add(new Edge(points.get(2), points.get(3)));
         }
         polygons = new ArrayList<>();
         {
