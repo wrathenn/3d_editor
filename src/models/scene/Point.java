@@ -1,4 +1,4 @@
-package models;
+package models.scene;
 
 public class Point {
     public String nameID;
@@ -96,10 +96,17 @@ public class Point {
         return new Point(p1.x * p2.x, p1.y * p2.y, p1.z * p2.z);
     }
 
-    public static void swap(Point p1, Point p2) {
-        Point temp = p1;
-        p1 = p2;
-        p2 = temp;
+    static class PointWrapper {
+        Point p;
+        PointWrapper(Point point) {
+            p = point;
+        }
+    }
+
+    public static void swap(PointWrapper p1, PointWrapper p2) {
+        Point temp = p1.p;
+        p1.p = p2.p;
+        p2.p = temp;
     }
 
     @Override

@@ -1,4 +1,6 @@
-package models;
+package models.draw;
+
+import models.scene.Point;
 
 public class PointDraw {
     public Point point;
@@ -51,9 +53,17 @@ public class PointDraw {
         return viewerVector;
     }
 
-    public static void swap(PointDraw p1, PointDraw p2) {
-        PointDraw pt = p1;
-        p1 = p2;
-        p2 = pt;
+    static class PointDrawWrapper {
+        PointDraw p;
+
+        public PointDrawWrapper(PointDraw p) {
+            this.p = p;
+        }
+    }
+
+    public static void swap(PointDrawWrapper p1, PointDrawWrapper p2) {
+        PointDraw pt = p1.p;
+        p1.p = p2.p;
+        p2.p = pt;
     }
 }

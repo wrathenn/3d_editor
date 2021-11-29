@@ -1,4 +1,8 @@
-package models;
+package models.draw;
+
+import models.scene.Point;
+
+import java.awt.*;
 
 public class Intensity {
     public double redI;
@@ -46,4 +50,16 @@ public class Intensity {
         );
     }
 
+    public Color applyColor(Color c) {
+        return new Color(
+                (int) (c.getRed() * redI),
+                (int) (c.getGreen() * greenI),
+                (int) (c.getBlue() * blueI)
+        );
+    }
+
+    @Override
+    public String toString() {
+        return "Intensity: " + redI + "|"+ greenI + "|"+ blueI;
+    }
 }

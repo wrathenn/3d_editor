@@ -1,11 +1,24 @@
-package models;
+package models.draw;
 
 import libs.SharedFunctions;
+import models.scene.Point;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class PolygonDraw {
     public Point normalLine;
+    private ArrayList<EdgeDraw> edges;
+    private Color color;
+
+    // ----- Конструкторы ----- //
+
+    public PolygonDraw(ArrayList<EdgeDraw> edges, Color color) {
+        this.edges = edges;
+        this.color = color;
+    }
+
+    // ----- Геттеры и Сеттеры ----- //
 
     public ArrayList<EdgeDraw> getEdges() {
         return edges;
@@ -15,11 +28,15 @@ public class PolygonDraw {
         this.edges = edges;
     }
 
-    private ArrayList<EdgeDraw> edges;
-
-    public PolygonDraw(ArrayList<EdgeDraw> edges) {
-        this.edges = edges;
+    public Color getColor() {
+        return color;
     }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    // ----- Остальные методы ----- //
 
     public void findNormalLine() {
         Point p1, p2, p3;

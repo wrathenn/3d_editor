@@ -1,4 +1,4 @@
-package models;
+package models.draw;
 
 public class EdgeDraw {
     public PointDraw begin;

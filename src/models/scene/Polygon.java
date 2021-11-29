@@ -1,21 +1,26 @@
-package models;
+package models.scene;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
 public class Polygon {
-    protected ArrayList<Edge> edges;
+    private ArrayList<Edge> edges;
+    private Color color;
+
+    // -----  Конструкторы ----- //
 
     public Polygon() {
         this.edges = new ArrayList<Edge>();
     }
 
-    public Polygon(ArrayList<Edge> edges) {
+    public Polygon(ArrayList<Edge> edges, Color c) {
         this.edges = edges;
+        this.color = c;
     }
 
-    public Polygon(Point[] points) throws IllegalArgumentException {
+    public Polygon(Point[] points, Color c) throws IllegalArgumentException {
         if (points.length < 3) {
             throw new IllegalArgumentException("Incorrect dots amount to make polygon - " + points.length + " (need 3 or more)");
         }
@@ -25,16 +30,22 @@ public class Polygon {
             edges.add(new Edge(points[i - 1], points[i]));
         }
         edges.add(new Edge(points[0], points[points.length - 1]));
+
+        color = c;
     }
 
-    Polygon(Edge[] edges) {
+    Polygon(Edge[] edges, Color c) {
         if (edges.length < 3) {
             throw new IllegalArgumentException("Incorrect edges amount to make polygon - " + edges.length + " (need 3 or more)");
         }
 
         this.edges = new ArrayList<Edge>();
         this.edges.addAll(Arrays.asList(edges));
+
+        color = c;
     }
+
+    // ----- Геттеры и Сеттеры ----- //
 
     public ArrayList<Edge> getEdges() {
         return edges;
@@ -51,6 +62,16 @@ public class Polygon {
     public void setEdge(int i, Edge edge) {
         edges.set(i, edge);
     }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    // ----- Остальные методы ----- //
 
     public void removePoint(Point p) {
         int onEndIndex = -1, onBeginIndex = -1;

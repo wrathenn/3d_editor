@@ -1,15 +1,11 @@
 package views.user_input;
 
-import models.Point;
-
-import views.callbacks.AddEdgeCallback;
 import views.callbacks.AddPolygonCallback;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class AddPolygonView extends JFrame {
     private final JLabel headingLabel = new JLabel("Input Polygon parameters");

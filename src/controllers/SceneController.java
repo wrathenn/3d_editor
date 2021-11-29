@@ -2,10 +2,11 @@ package controllers;
 
 import exceptions.ExistedNameException;
 import exceptions.NotExistedNameException;
-import models.*;
+import models.draw.Camera;
+import models.scene.Edge;
+import models.scene.Point;
+import models.scene.Polygon;
 import repositories.SceneRepository;
-
-import java.util.ArrayList;
 
 public class SceneController {
 

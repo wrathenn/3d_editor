@@ -1,6 +1,6 @@
 package views.user_input;
 
-import models.Point;
+import models.scene.Point;
 import views.callbacks.AddPointCallback;
 
 import javax.swing.*;

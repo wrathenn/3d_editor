@@ -1,4 +1,4 @@
-package models;
+package models.draw;
 
 
 import Jama.Matrix;

@@ -1,8 +1,7 @@
 package views;
 
-import models.Camera;
+import models.draw.Camera;
 import repositories.SceneRepository;
-import models.Point;
 
 import javax.swing.*;
 import java.awt.*;

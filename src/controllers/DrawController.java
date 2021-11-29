@@ -1,17 +1,19 @@
 package controllers;
 
-import models.*;
-import models.Point;
-import models.Polygon;
+import models.draw.Camera;
+import models.draw.EdgeDraw;
+import models.draw.PointDraw;
+import models.draw.PolygonDraw;
+import models.scene.Edge;
+import models.scene.Point;
+import models.scene.Polygon;
 import org.jetbrains.annotations.Nullable;
 import repositories.DrawerZBuffer;
 import repositories.SceneRepository;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class DrawController {
     private DrawerZBuffer drawerVisitor;
@@ -85,7 +87,7 @@ public class DrawController {
                 edgesForNewPoly.add(newEdge);
             }
 
-            polygonsToDraw.add(new PolygonDraw(edgesForNewPoly));
+            polygonsToDraw.add(new PolygonDraw(edgesForNewPoly, p.getColor()));
         }
     }
 

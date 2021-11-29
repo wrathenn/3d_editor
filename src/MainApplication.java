@@ -2,10 +2,10 @@ import controllers.DrawController;
 import controllers.SceneController;
 import exceptions.ExistedNameException;
 import exceptions.NotExistedNameException;
-import models.Camera;
-import models.Edge;
-import models.Point;
-import models.Polygon;
+import models.draw.Camera;
+import models.scene.Edge;
+import models.scene.Point;
+import models.scene.Polygon;
 import repositories.SceneRepository;
 import repositories.DrawerZBuffer;
 import views.user_input.AddEdgeView;
@@ -141,9 +141,8 @@ public class MainApplication extends JFrame {
                 }
 
                 Point[] pArr = new Point[points.size()];
-                Polygon newPoly = new Polygon(points.toArray(pArr));
-
-                    sceneController.add(newPoly);
+                Polygon newPoly = new Polygon(points.toArray(pArr), Color.GREEN);
+                sceneController.add(newPoly);
             });
 
             frame.setVisible(true);

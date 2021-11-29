@@ -2,13 +2,13 @@ package repositories;
 
 import exceptions.ExistedNameException;
 import exceptions.NotExistedNameException;
-import models.Camera;
-import models.Point;
-import models.Edge;
-import models.Polygon;
+import models.draw.Camera;
+import models.scene.Point;
+import models.scene.Edge;
+import models.scene.Polygon;
 
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class SceneRepository {
@@ -33,9 +33,9 @@ public class SceneRepository {
 //            points.add(new Point("M7", 50, -50, 100));
 //            points.add(new Point("M8", -50, -50, 100));
             // треугольник
-            points.add(new Point("M1", 0, 50, 0));
-            points.add(new Point("M2", -40, 10, 10));
-            points.add(new Point("M3", 30, 0, 20));
+            points.add(new Point("M1", 0, 250, 0));
+            points.add(new Point("M2", -250, 60, 25));
+            points.add(new Point("M3", 200, 0, 75));
         }
         edges = new ArrayList<>();
         {
@@ -62,7 +62,7 @@ public class SceneRepository {
         }
         polygons = new ArrayList<>();
         {
-            polygons.add(new Polygon(edges)); // TODO: костыль убрать
+            polygons.add(new Polygon(edges, Color.blue)); // TODO: костыль убрать
         }
 
         cameras = new ArrayList<>();

@@ -1,4 +1,4 @@
-package models;
+package models.scene;
 
 public class Edge {
     public Point begin;

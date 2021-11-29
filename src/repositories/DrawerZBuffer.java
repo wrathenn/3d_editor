@@ -2,9 +2,8 @@ package repositories;
 
 import libs.SharedFunctions;
 import libs.SortedLinkedList;
-import models.*;
-import models.Point;
-import models.Polygon;
+import models.draw.*;
+import models.scene.Point;
 
 import java.awt.*;
 import java.util.*;
@@ -15,11 +14,11 @@ public class DrawerZBuffer {
 
     private double[][] zBuffer;
 
-    private final Intensity diffusionI = new Intensity(0.3, 0.3, 0.3);
+    private final Intensity diffusionI = new Intensity(0.7, 0.7, 0.7);
     private final Intensity backGroundI = new Intensity(0.2, 0.2, 0.2);
 
-    private double width;
-    private double height;
+    private int width;
+    private int height;
 
     public DrawerZBuffer(int width, int height) {
         super();
@@ -163,62 +162,6 @@ public class DrawerZBuffer {
         point.intensity = curI;
     }
 
-    public void visit(Point p) {
-//        transformPointCamera(p);
-
-        canvas.drawOval((int) p.getX(), (int) p.getY(), 2, 2);
-        canvas.drawString(p.getNameID(), (int) p.getX() - 2, (int) p.getY() - 2);
-
-        System.out.println("Drawing point");
-    }
-
-    public void visit(Edge e) {
-        Point begin = new Point(e.getBegin());
-        Point end = new Point(e.getEnd());
-
-        visit(begin);
-        visit(end);
-
-//        transformPointCamera(begin);
-//        transformPointCamera(end);
-
-        drawLine(begin, end);
-
-        System.out.println("Drawing edge");
-    }
-
-    public void visit(Polygon p) {
-        // Преобразование по камере
-        // В каждом ребре точка начала будет выше по Y
-        for (Edge e : p.getEdges()) {
-            Point pBegin = e.getBegin();
-            Point pEnd = e.getEnd();
-
-//            transformPointCamera(pBegin);
-//            transformPointCamera(pEnd);
-
-            if (pBegin.getY() < pEnd.getY()) {
-                Point.swap(pBegin, pEnd);
-            }
-        }
-
-        // Отсортировать ребра по убыванию Y начала ребра
-        ArrayList<Edge> edges = new ArrayList<>(p.getEdges());
-        edges.sort((a, b) -> {
-            if (a.getBegin().getY() > b.getBegin().getY()) {
-                return -1;
-            } else if (a.getBegin().getY() < b.getBegin().getY()) {
-                return 1;
-            }
-            return 0;
-        });
-
-        // Найти нормаль в каждой точке по той формуле
-
-        System.out.println("Drawing Polygon");
-    }
-
-
     static class EdgeDrawInfo {
         public double lenY;
         public double x;
@@ -266,10 +209,12 @@ public class DrawerZBuffer {
         SortedLinkedList<EdgeDrawInfo> infoList = new SortedLinkedList<>((o1, o2) ->
                 SharedFunctions.doubleCompare(o2.yBegin, o1.yBegin));
         LinkedList<EdgeDrawInfo> activeList = new LinkedList<>();
+        Color c = poly.getColor();
 
         // В каждом ребре начало будет выше по Y, чем конец
         for (EdgeDraw e : poly.getEdges()) {
             infoList.add(new EdgeDrawInfo(e));
+            System.out.println(e.begin.intensity + ", " + e.end.intensity);
         }
 
         double currentY = infoList.getFirst().yBegin;
@@ -297,6 +242,16 @@ public class DrawerZBuffer {
                 Intensity dI = xzEnd.intensity.minus(xzBegin.intensity).divide(xzEnd.x / xzBegin.x);
 
                 while (xzBegin.x < xzEnd.x) {
+                    int cx = (int) xzBegin.x;
+                    int cy = (int) currentY;
+                    if (cx >= width || cx < 0 || cy >= height || cy < 0) {
+                        continue;
+                    }
+
+                    Color c1 = xzBegin.intensity.applyColor(c);
+                    System.out.println(c + ", " + c1 + c1.getAlpha() + " " + xzBegin.intensity);
+                    canvas.setColor(c1);
+
                     if (zBuffer[(int) xzBegin.x][(int) currentY] < xzBegin.z) {
                         zBuffer[(int) xzBegin.x][(int) currentY] = xzBegin.z;
                         canvas.drawLine((int) xzBegin.x, (int) currentY, (int) xzBegin.x, (int) currentY);
