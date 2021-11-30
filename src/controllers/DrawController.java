@@ -54,10 +54,10 @@ public class DrawController {
 
     private @Nullable EdgeDraw findEdgeDrawByPointNames(Edge edge, List<EdgeDraw> edgeList) {
         for (EdgeDraw e : edgeList) {
-            if (edge.begin.nameID.equals(e.begin.getNameID()) && edge.end.nameID.equals(e.end.getNameID())) {
+            if (edge.getBegin().getNameID().equals(e.getBegin().getNameID()) && edge.getEnd().getNameID().equals(e.getEnd().getNameID())) {
                 return e;
             }
-            if (edge.begin.nameID.equals(e.end.getNameID()) && edge.end.nameID.equals(e.begin.getNameID())) {
+            if (edge.getBegin().getNameID().equals(e.getEnd().getNameID()) && edge.getEnd().getNameID().equals(e.getBegin().getNameID())) {
                 return e;
             }
         }
@@ -74,8 +74,8 @@ public class DrawController {
         }
 
         for (Edge e : repo.getEdges()) {
-            PointDraw begin = findPointDrawByName(e.begin.nameID, pointsToDraw);
-            PointDraw end = findPointDrawByName(e.end.nameID, pointsToDraw);
+            PointDraw begin = findPointDrawByName(e.getBegin().getNameID(), pointsToDraw);
+            PointDraw end = findPointDrawByName(e.getEnd().getNameID(), pointsToDraw);
             edgesToDraw.add(new EdgeDraw(begin, end));
         }
 
@@ -93,22 +93,22 @@ public class DrawController {
 
     private void findPointsColorInPolygon(PolygonDraw p) {
         for (EdgeDraw e : p.getEdges()) {
-            if (e.begin.intensity == null) {
-                drawerVisitor.findPointColor(e.begin, p.normalLine);
+            if (e.getBegin().getIntensity() == null) {
+                drawerVisitor.findPointColor(e.getBegin(), p.getNormalLine());
             }
-            if (e.end.intensity == null) {
-                drawerVisitor.findPointColor(e.end, p.normalLine);
+            if (e.getEnd().getIntensity() == null) {
+                drawerVisitor.findPointColor(e.getEnd(), p.getNormalLine());
             }
         }
     }
 
     private void clearPointsColorInPolygon(PolygonDraw p) {
         for (EdgeDraw e : p.getEdges()) {
-            if (e.begin.intensity != null) {
-                e.begin.intensity = null;
+            if (e.getBegin().getIntensity() != null) {
+                e.getBegin().setIntensity(null);
             }
-            if (e.end.intensity != null) {
-                e.end.intensity = null;
+            if (e.getEnd().getIntensity() != null) {
+                e.getEnd().setIntensity(null);
             }
         }
     }
@@ -116,18 +116,15 @@ public class DrawController {
     private void drawPreprocessing(ArrayList<PointDraw> points,
                                    ArrayList<PolygonDraw> polygons) {
 
-        for (PolygonDraw poly : polygons) {
-            poly.findNormalLine();
-        }
-
         for (PointDraw p : points) {
-            drawerVisitor.transformPointCamera(p);
+            drawerVisitor.transformPointToCameraCoordinates(p);
+
             drawerVisitor.findViewerVector(p);
         }
 
         for (PolygonDraw poly : polygons) {
             poly.findNormalLine();
-            // Найти цвет каждой точки, не находить, если уже найдет
+            // Найти цвет каждой точки, не находить, если уже найден
             findPointsColorInPolygon(poly);
 
             // Отрисовка полигона
@@ -135,11 +132,12 @@ public class DrawController {
 
             // Очистить цвет каждой точки
             clearPointsColorInPolygon(poly);
+
         }
     }
 
 
-    public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
+    synchronized public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
         canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
         canvas.drawRect(0, 0, camera.getScreenWidth() - 1, camera.getScreenHeight() - 1);
 

@@ -2,6 +2,7 @@ package models.draw;
 
 
 import Jama.Matrix;
+import models.scene.Point;
 
 public class Camera {
     private double x;
@@ -17,10 +18,12 @@ public class Camera {
     private Matrix scaleMatrix;
     private Matrix moveMatrix;
 
-    private final int DEFAULT_SCREEN_DISTANCE = 10;
+    private final int DEFAULT_SCREEN_DISTANCE = 60;
     private final int DEFAULT_X = 0;
     private final int DEFAULT_Y = 0;
-    private final int DEFAULT_Z = -5;
+    private final int DEFAULT_Z = 0;
+
+    // ----- Конструкторы ----- //
 
     public Camera() {
         this.x = DEFAULT_X;
@@ -44,6 +47,8 @@ public class Camera {
         scaleMatrix = Matrix.identity(3, 3);
         moveMatrix = Matrix.identity(3, 3);
     }
+
+    // ----- Геттеры и Сеттеры ----- //
 
     public double getX() {
         return x;
@@ -88,5 +93,31 @@ public class Camera {
 
     public int getScreenHeight() {
         return screenHeight;
+    }
+
+    // ----- Нормальные методы ----- //
+
+    public void findViewerVector(PointDraw point) {
+        Point viewVector = new Point(point.getPoint()).makeUnitVector();
+        point.setViewerVector(viewVector);
+    }
+
+    public void transformPointToCameraCoordinates(PointDraw point) {
+        Point p = point.getPoint();
+
+        p.setX(p.getX() - this.x);
+        p.setY(p.getY() - this.y);
+        p.setZ(p.getZ() - this.z);
+    }
+
+    public void transformPointToCameraScreen(PointDraw point) {
+        Point p = point.getPoint();
+
+        p.setY(p.getY() * this.screenDistance / p.getZ());
+        p.setX(p.getX() * this.screenDistance / p.getZ());
+//        p.setZ(this.screenDistance);
+
+        p.setX((int) (p.getX() + (this.screenWidth / 2)));
+        p.setY((int) (this.screenHeight / 2 - p.getY()));
     }
 }

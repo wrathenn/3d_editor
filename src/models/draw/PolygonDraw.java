@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class PolygonDraw {
-    public Point normalLine;
+    private Point normalLine;
     private ArrayList<EdgeDraw> edges;
     private Color color;
 
@@ -28,6 +28,14 @@ public class PolygonDraw {
         this.edges = edges;
     }
 
+    public Point getNormalLine() {
+        return normalLine;
+    }
+
+    public void setNormalLine(Point normalLine) {
+        this.normalLine = normalLine;
+    }
+
     public Color getColor() {
         return color;
     }
@@ -41,16 +49,16 @@ public class PolygonDraw {
     public void findNormalLine() {
         Point p1, p2, p3;
         for (int i = 0; i < edges.size(); i++) {
-            p1 = edges.get(i).begin.point;
-            p2 = edges.get(i).end.point;
-            p3 = edges.get(i == edges.size() - 1 ? 0 : i + 1).end.point;
+            p1 = edges.get(i).getBegin().getPoint();
+            p2 = edges.get(i).getEnd().getPoint();
+            p3 = edges.get(i == edges.size() - 1 ? 0 : i + 1).getEnd().getPoint();
 
-            double vx1 = p1.x - p2.x;
-            double vx2 = p2.x - p3.x;
-            double vy1 = p1.y - p2.y;
-            double vy2 = p2.y - p3.y;
-            double vz1 = p1.z - p2.z;
-            double vz2 = p2.z - p3.z;
+            double vx1 = p1.getX() - p2.getX();
+            double vx2 = p2.getX() - p3.getX();
+            double vy1 = p1.getY() - p2.getY();
+            double vy2 = p2.getY() - p3.getY();
+            double vz1 = p1.getZ() - p2.getZ();
+            double vz2 = p2.getZ() - p3.getZ();
 
             double nx = vy1 * vz2 - vz1 * vy2;
             double ny = vz1 * vx2 - vx1 * vz2;

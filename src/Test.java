@@ -1,3 +1,5 @@
+import Jama.Matrix;
+
 import java.util.LinkedList;
 
 class DrawList extends LinkedList<Integer> {
@@ -22,12 +24,7 @@ class DrawList extends LinkedList<Integer> {
 
 public class Test {
     public static void main(String[] args) {
-        DrawList list = new DrawList();
-        list.add(1);
-        list.add(2);
-        list.add(-1);
-        for (Integer i : list) {
-            System.out.println(i);
-        }
+        Matrix m = Matrix.identity(3,3);
+        m.print(3, 3);
     }
 }

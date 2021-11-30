@@ -42,11 +42,11 @@ public class Intensity {
         return this;
     }
 
-    public static Intensity multiplyVector(Intensity i, Point p) {
+    public static Intensity multiply(Intensity i, double n) {
         return new Intensity(
-                i.redI *= p.x,
-                i.greenI *= p.y,
-                i.blueI *= p.z
+                Math.abs(i.redI * n),
+                Math.abs(i.greenI * n),
+                Math.abs(i.blueI * n)
         );
     }
 
@@ -60,6 +60,6 @@ public class Intensity {
 
     @Override
     public String toString() {
-        return "Intensity: " + redI + "|"+ greenI + "|"+ blueI;
+        return String.format("Intensity{redI=%.4f, greenI=%.4f, blueI=%.4f}", redI, greenI, blueI);
     }
 }

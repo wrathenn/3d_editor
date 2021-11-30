@@ -3,15 +3,27 @@ package models.draw;
 import models.scene.Point;
 
 public class PointDraw {
-    public Point point;
-    public Point viewerVector;
-    public Intensity intensity;
+    private final Point point;
+    private Point viewerVector;
+    private Intensity intensity;
+
+    // ----- Конструкторы ----- //
 
     public PointDraw(Point p) {
         this.point = new Point(p);
     }
 
+    public PointDraw(PointDraw p) {
+        this.point = new Point(p.point);
+        this.viewerVector = p.viewerVector;
+        this.intensity = p.intensity;
+    }
+
     // ----- Геттеры и Сеттеры ----- //
+
+    public Point getPoint() {
+        return point;
+    }
 
     public double getX() {
         return point.getX();
@@ -53,6 +65,16 @@ public class PointDraw {
         return viewerVector;
     }
 
+    public Intensity getIntensity() {
+        return intensity;
+    }
+
+    public void setIntensity(Intensity intensity) {
+        this.intensity = intensity;
+    }
+
+    // ----- Object ----- //
+
     static class PointDrawWrapper {
         PointDraw p;
 
@@ -65,5 +87,14 @@ public class PointDraw {
         PointDraw pt = p1.p;
         p1.p = p2.p;
         p2.p = pt;
+    }
+
+    @Override
+    public String toString() {
+        return "PointDraw {" +
+                "point = " + point +
+                ", viewerVector = " + viewerVector +
+                ", intensity = " + intensity +
+                "}";
     }
 }

@@ -1,68 +1,62 @@
 package models.scene;
 
+import Jama.Matrix;
+
 public class Point {
-    public String nameID;
-    public double x;
-    public double y;
-    public double z;
+    private String nameID;
+    private final Matrix m = new Matrix(1, 3);
 
     // ----- Конструкторы ----- //
 
     public Point() {
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
     }
 
     public Point(String nameID, double x, double y, double z) {
         this.nameID = nameID;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        setX(x);
+        setY(y);
+        setZ(z);
     }
 
     public Point(String nameId) {
         this.nameID = nameId;
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
     }
 
     public Point(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        setX(x);
+        setY(y);
+        setZ(z);
     }
 
     // Конструктор копирования
     public Point(Point p) {
-        this(p.nameID, p.x, p.y, p.z);
+        this(p.nameID, p.getX(), p.getY(), p.getZ());
     }
 
     // ----- Геттеры и Сеттеры ----- //
 
     public double getX() {
-        return x;
+        return m.get(0, 0);
     }
 
     public void setX(double x) {
-        this.x = x;
+        m.set(0,0, x);
     }
 
     public double getY() {
-        return y;
+        return m.get(0, 1);
     }
 
     public void setY(double y) {
-        this.y = y;
+        m.set(0,1, y);
     }
 
     public double getZ() {
-        return z;
+        return m.get(0, 2);
     }
 
     public void setZ(double z) {
-        this.z = z;
+        m.set(0,2, z);;
     }
 
     public String getNameID() {
@@ -74,26 +68,32 @@ public class Point {
     }
 
     public double vectorLen() {
+        double x = getX();
+        double y = getY();
+        double z = getZ();
+
         return Math.sqrt(x * x + y * y + z * z);
     }
 
     public Point makeUnitVector() {
         double len = vectorLen();
-        x /= len;
-        y /= len;
-        z /= len;
+        setX(getX() / len);
+        setY(getY() / len);
+        setZ(getZ() / len);
+
         return this;
     }
 
     public Point minus(Point p) {
-        x -= p.x;
-        y -= p.y;
-        z -= p.z;
+        setX(getX() - p.getX());
+        setY(getY() - p.getY());
+        setZ(getZ() - p.getZ());
+
         return this;
     }
 
-    public static Point multiplyOneByOne(Point p1, Point p2) {
-        return new Point(p1.x * p2.x, p1.y * p2.y, p1.z * p2.z);
+    public static double scalarProduct(Point p1, Point p2) {
+        return p1.getX() * p2.getX() + p1.getY() * p2.getY() + p1.getZ() * p2.getZ();
     }
 
     static class PointWrapper {
@@ -111,6 +111,6 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point " + this.nameID + ", x: " + this.x + ", y: " + this.y + ", z: " + this.z;
+        return String.format("Point{Name=%s, x=%.6f, y=%.6f, z=%.6f}", nameID, getX(), getY(), getZ());
     }
 }

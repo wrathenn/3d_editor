@@ -2,6 +2,7 @@ package views;
 
 import models.draw.Camera;
 import repositories.SceneRepository;
+import views.callbacks.RenderCallback;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,8 @@ import java.awt.event.MouseMotionListener;
 public class CanvasView extends JPanel implements MouseListener, MouseMotionListener {
 
     public SceneRepository sceneRepository;
+
+    public RenderCallback renderCallback;
 
     public CanvasView() {
         super();
@@ -56,6 +59,8 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         System.out.println("\tCamera: " + camera.getX() + ", " + camera.getY());
         oldX = curX;
         oldY = curY;
+
+        renderCallback.render();
     }
 
     @Override

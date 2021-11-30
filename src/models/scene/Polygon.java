@@ -11,10 +11,6 @@ public class Polygon {
 
     // -----  Конструкторы ----- //
 
-    public Polygon() {
-        this.edges = new ArrayList<Edge>();
-    }
-
     public Polygon(ArrayList<Edge> edges, Color c) {
         this.edges = edges;
         this.color = c;

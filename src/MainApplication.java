@@ -8,6 +8,7 @@ import models.scene.Point;
 import models.scene.Polygon;
 import repositories.SceneRepository;
 import repositories.DrawerZBuffer;
+import views.callbacks.RenderCallback;
 import views.user_input.AddEdgeView;
 import views.user_input.AddPointView;
 import views.CanvasView;
@@ -88,11 +89,13 @@ public class MainApplication extends JFrame {
 
         canvas.setSceneRepository(sceneController.getSceneRepository());
 
-        drawButton.addActionListener(e -> {
+        drawButton.addActionListener(e -> canvas.renderCallback.render());
+
+        canvas.renderCallback = () -> {
             Camera camera = sceneController.getCamera(0);
             camera.setDimensions(canvas.getWidth(), canvas.getHeight());
             drawController.draw(canvas.getGraphics(), sceneController.getCamera(0), sceneController.getSceneRepository());
-        });
+        };
 
         addPointButton.addActionListener(e -> {
             AddPointView frame = new AddPointView();
@@ -141,7 +144,7 @@ public class MainApplication extends JFrame {
                 }
 
                 Point[] pArr = new Point[points.size()];
-                Polygon newPoly = new Polygon(points.toArray(pArr), Color.GREEN);
+                Polygon newPoly = new Polygon(points.toArray(pArr), new Color(200, 200, 200));
                 sceneController.add(newPoly);
             });
 
