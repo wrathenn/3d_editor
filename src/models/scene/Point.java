@@ -67,6 +67,12 @@ public class Point {
         this.nameID = nameID;
     }
 
+    public Matrix getM() {
+        return m;
+    }
+
+    // ----- Нормальные методы ----- //
+
     public double vectorLen() {
         double x = getX();
         double y = getY();
@@ -95,6 +101,8 @@ public class Point {
     public static double scalarProduct(Point p1, Point p2) {
         return p1.getX() * p2.getX() + p1.getY() * p2.getY() + p1.getZ() * p2.getZ();
     }
+
+    // ----- Object ----- //
 
     static class PointWrapper {
         Point p;

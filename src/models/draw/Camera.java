@@ -18,7 +18,7 @@ public class Camera {
     private Matrix scaleMatrix;
     private Matrix moveMatrix;
 
-    private final int DEFAULT_SCREEN_DISTANCE = 60;
+    private final int DEFAULT_SCREEN_DISTANCE = 150;
     private final int DEFAULT_X = 0;
     private final int DEFAULT_Y = 0;
     private final int DEFAULT_Z = 0;
