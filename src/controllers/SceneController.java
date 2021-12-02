@@ -58,7 +58,7 @@ public class SceneController {
         return sceneRepository.findPoint(name);
     }
 
-    public Camera getCamera(int index) {
-        return sceneRepository.getCamera(index);
+    public Camera getCamera() {
+        return sceneRepository.getCamera();
     }
 }

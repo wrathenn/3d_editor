@@ -58,6 +58,13 @@ public class Intensity {
         );
     }
 
+    public void applyColorDBG(Color c) {
+        System.out.printf("DBG color: %d, %d, %d%n\n",
+                (int) (c.getRed() * redI),
+                (int) (c.getGreen() * greenI),
+                (int) (c.getBlue() * blueI));
+    }
+
     @Override
     public String toString() {
         return String.format("Intensity{redI=%.4f, greenI=%.4f, blueI=%.4f}", redI, greenI, blueI);

@@ -137,10 +137,7 @@ public class DrawController {
     }
 
 
-    synchronized public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
-        canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
-        canvas.drawRect(0, 0, camera.getScreenWidth() - 1, camera.getScreenHeight() - 1);
-
+    public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
         drawerVisitor.setSize(camera.getScreenWidth(), camera.getScreenHeight());
         drawerVisitor.clearBuffer();
 
@@ -152,6 +149,9 @@ public class DrawController {
         ArrayList<PolygonDraw> polygonsToDraw = new ArrayList<>();
 
         drawCopy(sceneRepository, pointsToDraw, edgesToDraw, polygonsToDraw);
+
+        canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
+        camera.createLookAt();
         drawPreprocessing(pointsToDraw, polygonsToDraw);
     }
 }

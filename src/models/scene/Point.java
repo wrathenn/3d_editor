@@ -1,31 +1,26 @@
 package models.scene;
 
-import Jama.Matrix;
-
-public class Point {
+public class Point extends Vector {
     private String nameID;
-    private final Vector v = new Vector();
 
     // ----- Конструкторы ----- //
 
     public Point() {
+        super();
     }
 
     public Point(String nameID, double x, double y, double z) {
+        super(x, y, z);
         this.nameID = nameID;
-        setX(x);
-        setY(y);
-        setZ(z);
     }
 
     public Point(String nameId) {
+        super();
         this.nameID = nameId;
     }
 
     public Point(double x, double y, double z) {
-        setX(x);
-        setY(y);
-        setZ(z);
+        super(x, y, z);
     }
 
     // Конструктор копирования
@@ -35,71 +30,12 @@ public class Point {
 
     // ----- Геттеры и Сеттеры ----- //
 
-    public double getX() {
-        return m.get(0, 0);
-    }
-
-    public void setX(double x) {
-        m.set(0,0, x);
-    }
-
-    public double getY() {
-        return m.get(0, 1);
-    }
-
-    public void setY(double y) {
-        m.set(0,1, y);
-    }
-
-    public double getZ() {
-        return m.get(0, 2);
-    }
-
-    public void setZ(double z) {
-        m.set(0,2, z);;
-    }
-
     public String getNameID() {
         return nameID;
     }
 
     public void setNameID(String nameID) {
         this.nameID = nameID;
-    }
-
-    public Matrix getM() {
-        return m;
-    }
-
-    // ----- Нормальные методы ----- //
-
-    public double vectorLen() {
-        double x = getX();
-        double y = getY();
-        double z = getZ();
-
-        return Math.sqrt(x * x + y * y + z * z);
-    }
-
-    public Point makeUnitVector() {
-        double len = vectorLen();
-        setX(getX() / len);
-        setY(getY() / len);
-        setZ(getZ() / len);
-
-        return this;
-    }
-
-    public Point minus(Point p) {
-        setX(getX() - p.getX());
-        setY(getY() - p.getY());
-        setZ(getZ() - p.getZ());
-
-        return this;
-    }
-
-    public static double scalarProduct(Point p1, Point p2) {
-        return p1.getX() * p2.getX() + p1.getY() * p2.getY() + p1.getZ() * p2.getZ();
     }
 
     // ----- Object ----- //

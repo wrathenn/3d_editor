@@ -2,12 +2,13 @@ package models.draw;
 
 import libs.SharedFunctions;
 import models.scene.Point;
+import models.scene.Vector;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class PolygonDraw {
-    private Point normalLine;
+    private Vector normalLine;
     private ArrayList<EdgeDraw> edges;
     private Color color;
 
@@ -28,11 +29,11 @@ public class PolygonDraw {
         this.edges = edges;
     }
 
-    public Point getNormalLine() {
+    public Vector getNormalLine() {
         return normalLine;
     }
 
-    public void setNormalLine(Point normalLine) {
+    public void setNormalLine(Vector normalLine) {
         this.normalLine = normalLine;
     }
 
@@ -76,7 +77,7 @@ public class PolygonDraw {
             ny /= len;
             nz /= len;
 
-            normalLine = new Point(nx, ny, nz);
+            normalLine = new Vector(nx, ny, nz);
             return;
         }
     }

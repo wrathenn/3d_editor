@@ -1,113 +1,88 @@
 package models.draw;
 
-
 import Jama.Matrix;
 import models.scene.Point;
+import models.scene.Vector;
 
 public class Camera {
-    private double x;
-    private double y;
-    private double z;
+    private static final Vector generalUp = new Vector(0, 1, 0);
 
-    private double screenDistance;
+    // ----- Переменные - позиция камеры ----- //
+
+    public Vector position = new Vector(0, 0, 1);
+    public Vector target = new Vector(0, 0, 0);
+
+    public Vector direction;
+    public Vector right;
+    public Vector up;
+
+    public Matrix lookAt;
+
+    // ----- Переменые - переспективная проекция ----- //
 
     private int screenWidth;
     private int screenHeight;
+    private double screenDistance = 150;
 
-    private Matrix rotateMatrix;
-    private Matrix scaleMatrix;
-    private Matrix moveMatrix;
-
-    private final int DEFAULT_SCREEN_DISTANCE = 150;
-    private final int DEFAULT_X = 0;
-    private final int DEFAULT_Y = 0;
-    private final int DEFAULT_Z = 0;
-
-    // ----- Конструкторы ----- //
+    // ----- Конструктор ----- //
 
     public Camera() {
-        this.x = DEFAULT_X;
-        this.y = DEFAULT_Y;
-        this.z = DEFAULT_Z;
-
-        this.screenDistance = DEFAULT_SCREEN_DISTANCE;
-
-        rotateMatrix = Matrix.identity(3, 3);
-        scaleMatrix = Matrix.identity(3, 3);
-        moveMatrix = Matrix.identity(3, 3);
+        createLookAt();
     }
 
-    public Camera(double x, double y, double z, double screenDistance) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.screenDistance = screenDistance;
+    // ----- Методы ----- //
 
-        rotateMatrix = Matrix.identity(3, 3);
-        scaleMatrix = Matrix.identity(3, 3);
-        moveMatrix = Matrix.identity(3, 3);
+    private void findDirections() {
+        direction = position.minus(target);
+        right = generalUp.cross(direction).normalizeEquals();
+        up = direction.cross(right);
     }
 
-    // ----- Геттеры и Сеттеры ----- //
+    public void createLookAt() {
+        findDirections();
 
-    public double getX() {
-        return x;
+        Matrix rotation = new Matrix(new double[][]{
+                {right.getX(), right.getY(), right.getZ(), 0},
+                {up.getX(), up.getY(), up.getZ(), 0},
+                {direction.getX(), direction.getY(), direction.getZ(), 0},
+                {0, 0, 0, 1}
+        });
+
+        Matrix translation = new Matrix(new double[][]{
+                {1, 0, 0, -position.getX()},
+                {0, 1, 0, -position.getY()},
+                {0, 0, 1, -position.getZ()},
+                {0, 0, 0, 1}
+        });
+
+        lookAt = rotation.times(translation);
+        System.out.println(lookAt);
     }
 
-    public void setX(double x) {
-        this.x = x;
+    public void moveX(double mov) {
+        position.setX(position.getX() + mov);
+        target.setX(target.getX() + mov);
     }
 
-    public double getY() {
-        return y;
+    public void moveY(double mov) {
+        position.setY(position.getY() + mov);
+        target.setY(target.getY() + mov);
     }
 
-    public void setY(double y) {
-        this.y = y;
+    public void moveZ(double mov) {
+        position.setZ(position.getZ() + mov);
+        target.setZ(target.getZ() + mov);
     }
 
-    public double getZ() {
-        return z;
-    }
-
-    public void setZ(double z) {
-        this.z = z;
-    }
-
-    public double getScreenDistance() {
-        return screenDistance;
-    }
-
-    public void setScreenDistance(double screenDistance) {
-        this.screenDistance = screenDistance;
-    }
-
-    public void setDimensions(int width, int height) {
-        screenWidth = width;
-        screenHeight = height;
-    }
-
-    public int getScreenWidth() {
-        return screenWidth;
-    }
-
-    public int getScreenHeight() {
-        return screenHeight;
-    }
-
-    // ----- Нормальные методы ----- //
-
-    public void findViewerVector(PointDraw point) {
-        Point viewVector = new Point(point.getPoint()).makeUnitVector();
-        point.setViewerVector(viewVector);
+    public Vector findViewerVector(PointDraw point) {
+        Vector viewVector = new Vector(point.getVector()).normalizeEquals();
+//        viewVector.minusEquals(position);
+        return viewVector;
     }
 
     public void transformPointToCameraCoordinates(PointDraw point) {
         Point p = point.getPoint();
-
-        p.setX(p.getX() - this.x);
-        p.setY(p.getY() - this.y);
-        p.setZ(p.getZ() - this.z);
+        p.timesRightEquals(lookAt);
     }
 
     public void transformPointToCameraScreen(PointDraw point) {
@@ -119,5 +94,44 @@ public class Camera {
 
         p.setX((int) (p.getX() + (this.screenWidth / 2)));
         p.setY((int) (this.screenHeight / 2 - p.getY()));
+    }
+
+    // ----- Геттеры и Сеттеры ----- //
+
+
+    public int getScreenWidth() {
+        return screenWidth;
+    }
+
+    public void setScreenWidth(int screenWidth) {
+        this.screenWidth = screenWidth;
+    }
+
+    public int getScreenHeight() {
+        return screenHeight;
+    }
+
+    public void setScreenHeight(int screenHeight) {
+        this.screenHeight = screenHeight;
+    }
+
+    public double getScreenDistance() {
+        return screenDistance;
+    }
+
+    public void setScreenDistance(double screenDistance) {
+        this.screenDistance = screenDistance;
+    }
+
+    public double getX() {
+        return position.getX();
+    }
+
+    public double getY() {
+        return position.getY();
+    }
+
+    public double getZ() {
+        return position.getZ();
     }
 }

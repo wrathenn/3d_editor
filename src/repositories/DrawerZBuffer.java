@@ -4,6 +4,7 @@ import libs.SharedFunctions;
 import libs.SortedLinkedList;
 import models.draw.*;
 import models.scene.Point;
+import models.scene.Vector;
 
 import java.awt.*;
 import java.util.*;
@@ -155,10 +156,11 @@ public class DrawerZBuffer {
     }
 
     public void findViewerVector(PointDraw point) {
-        camera.findViewerVector(point);
+        Vector viewerVector = camera.findViewerVector(point);
+        point.setViewerVector(viewerVector);
     }
 
-    public void findPointColor(PointDraw point, Point polyNormal) {
+    public void findPointColor(PointDraw point, Vector polyNormal) {
         // Почленное умножение нормали точки на вектор к наблюдателю
         double diffusionLN = Point.scalarProduct(point.getViewerVector(), polyNormal);
         // Нахождение диффузной составляющей интенсивности
@@ -196,6 +198,7 @@ public class DrawerZBuffer {
 
             while (xzBegin.x < xzEnd.x) {
                 Color c1 = xzBegin.intensity.applyColor(polyColor);
+
                 drawPixelCheckX((int) xzBegin.x, currentY, xzBegin.z, c1);
 
                 xzBegin.x++;

@@ -92,9 +92,11 @@ public class MainApplication extends JFrame {
         drawButton.addActionListener(e -> canvas.renderCallback.render());
 
         canvas.renderCallback = () -> {
-            Camera camera = sceneController.getCamera(0);
-            camera.setDimensions(canvas.getWidth(), canvas.getHeight());
-            drawController.draw(canvas.getGraphics(), sceneController.getCamera(0), sceneController.getSceneRepository());
+            Camera camera = sceneController.getCamera();
+            camera.setScreenHeight(canvas.getHeight());
+            camera.setScreenWidth(canvas.getWidth());
+//            camera.setDimensions(canvas.getWidth(), canvas.getHeight());
+            drawController.draw(canvas.getGraphics(), sceneController.getCamera(), sceneController.getSceneRepository());
         };
 
         addPointButton.addActionListener(e -> {

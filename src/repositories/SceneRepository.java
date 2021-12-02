@@ -17,7 +17,7 @@ public class SceneRepository {
     private ArrayList<Edge> edges;
     private ArrayList<Polygon> polygons;
 
-    private ArrayList<Camera> cameras;
+    private Camera camera;
 
     // ----- Конструкторы ----- //
 
@@ -95,11 +95,11 @@ public class SceneRepository {
 
         ArrayList<Polygon> polys = new ArrayList<>(Arrays.asList(
                 new Polygon(p1, Color.red),
-                new Polygon(p2, Color.red),
+                new Polygon(p2, Color.blue),
                 new Polygon(p3, Color.red),
                 new Polygon(p4, Color.red),
                 new Polygon(p5, Color.red),
-                new Polygon(p6, Color.red)
+                new Polygon(p6, Color.magenta)
         ));
 
         points.addAll(ps);
@@ -165,8 +165,7 @@ public class SceneRepository {
 
         addCube();
 
-        cameras = new ArrayList<>();
-        cameras.add(new Camera());
+        camera = new Camera();
     }
 
     // ----- Геттеры и Сеттеры ----- //
@@ -205,21 +204,8 @@ public class SceneRepository {
         polygons.add(p);
     }
 
-    public void add(Camera c) {
-        System.out.println("Добавление камеры " + c.toString());
-        cameras.add(c);
-    }
-
-    public ArrayList<Camera> getCameras() {
-        return cameras;
-    }
-
-    public Camera getCamera(int index) {
-        return cameras.get(index);
-    }
-
-    public void addCamera(Camera camera) {
-        this.cameras.add(camera);
+    public Camera getCamera() {
+        return camera;
     }
 
     public Point findPoint(String name) throws NotExistedNameException {

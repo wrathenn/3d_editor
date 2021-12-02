@@ -1,10 +1,11 @@
 package models.draw;
 
 import models.scene.Point;
+import models.scene.Vector;
 
 public class PointDraw {
     private final Point point;
-    private Point viewerVector;
+    private Vector viewerVector;
     private Intensity intensity;
 
     // ----- Конструкторы ----- //
@@ -57,11 +58,15 @@ public class PointDraw {
         return point.getNameID();
     }
 
-    public void setViewerVector(Point viewerVector) {
+    public Vector getVector() {
+        return point;
+    }
+
+    public void setViewerVector(Vector viewerVector) {
         this.viewerVector = viewerVector;
     }
 
-    public Point getViewerVector() {
+    public Vector getViewerVector() {
         return viewerVector;
     }
 
