@@ -18,8 +18,8 @@ public class Camera {
 
     public Matrix lookAt;
 
-    private double pitch = 0;
-    private double yaw = -90;
+    private double pitch;
+    private double yaw = 90;
 
     // ----- Переменные - переспективная проекция ----- //
 

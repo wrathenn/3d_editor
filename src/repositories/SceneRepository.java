@@ -95,17 +95,41 @@ public class SceneRepository {
 
         ArrayList<Polygon> polys = new ArrayList<>(Arrays.asList(
                 new Polygon(p1, Color.red),
-                new Polygon(p2, Color.blue),
+                new Polygon(p2, Color.red),
                 new Polygon(p3, Color.red),
                 new Polygon(p4, Color.red),
                 new Polygon(p5, Color.red),
-                new Polygon(p6, Color.magenta)
+                new Polygon(p6, Color.red)
         ));
 
         points.addAll(ps);
         edges.addAll(es);
         polygons.addAll(polys);
 
+    }
+
+    private void testComplex() {
+        ArrayList<Point> ps = new ArrayList<>(Arrays.asList(
+                new Point("Z1", -100, 100, 120),
+                new Point("Z2", 0, +5, 120),
+                new Point("Z3", +100, 100, 120),
+                new Point("Z4", +100, -100, 120),
+                new Point("Z5", -100, -100, 120)
+        ));
+
+        ArrayList<Edge> es = new ArrayList<>(Arrays.asList(
+                new Edge(ps.get(0), ps.get(1)),
+                new Edge(ps.get(1), ps.get(2)),
+                new Edge(ps.get(2), ps.get(3)),
+                new Edge(ps.get(3), ps.get(4)),
+                new Edge(ps.get(4), ps.get(0))
+        ));
+
+        Polygon p = new Polygon(es, Color.blue);
+
+        points.addAll(ps);
+        edges.addAll(es);
+        polygons.add(p);
     }
 
     public SceneRepository() {
@@ -163,8 +187,8 @@ public class SceneRepository {
 //            );
         }
 
-        addCube();
-
+//        addCube();
+        testComplex();
         camera = new Camera();
     }
 
