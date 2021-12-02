@@ -95,11 +95,11 @@ public class SceneRepository {
 
         ArrayList<Polygon> polys = new ArrayList<>(Arrays.asList(
                 new Polygon(p1, Color.red),
-                new Polygon(p2, Color.blue),
-                new Polygon(p3, Color.MAGENTA),
-                new Polygon(p4, Color.GREEN),
-                new Polygon(p5, Color.orange),
-                new Polygon(p6, Color.PINK)
+                new Polygon(p2, Color.red),
+                new Polygon(p3, Color.red),
+                new Polygon(p4, Color.red),
+                new Polygon(p5, Color.red),
+                new Polygon(p6, Color.red)
         ));
 
         points.addAll(ps);

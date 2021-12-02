@@ -4,7 +4,7 @@ import Jama.Matrix;
 
 public class Point {
     private String nameID;
-    private final Matrix m = new Matrix(1, 3);
+    private final Vector v = new Vector();
 
     // ----- Конструкторы ----- //
 
