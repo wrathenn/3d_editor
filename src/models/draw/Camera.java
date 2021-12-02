@@ -9,8 +9,8 @@ public class Camera {
 
     // ----- Переменные - позиция камеры ----- //
 
-    public Vector position = new Vector(0, 0, 1);
-    public Vector target = new Vector(0, 0, 0);
+    public Vector position = new Vector(0, 0, 0);
+    public Vector target = new Vector(0, 0, 1);
 
     public Vector direction;
     public Vector right;
@@ -18,7 +18,10 @@ public class Camera {
 
     public Matrix lookAt;
 
-    // ----- Переменые - переспективная проекция ----- //
+    private double pitch = 0;
+    private double yaw = -90;
+
+    // ----- Переменные - переспективная проекция ----- //
 
     private int screenWidth;
     private int screenHeight;
@@ -34,6 +37,11 @@ public class Camera {
 
     private void findDirections() {
         direction = position.minus(target);
+        direction.setX(Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
+        direction.setY(Math.sin(Math.toRadians(pitch)));
+        direction.setZ(Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
+        direction.normalizeEquals();
+
         right = generalUp.cross(direction).normalizeEquals();
         up = direction.cross(right);
     }
@@ -74,9 +82,22 @@ public class Camera {
         target.setZ(target.getZ() + mov);
     }
 
+    public void rotateX(double a) {
+        yaw += a;
+    }
+
+    public void rotateY(double a) {
+        pitch += a;
+        if (pitch >= 90) {
+            pitch = 90;
+        }
+        if (pitch <= -90) {
+            pitch = -90;
+        }
+    }
+
     public Vector findViewerVector(PointDraw point) {
         Vector viewVector = new Vector(point.getVector()).normalizeEquals();
-//        viewVector.minusEquals(position);
         return viewVector;
     }
 

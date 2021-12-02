@@ -13,9 +13,10 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
     public SceneRepository sceneRepository;
     public RenderCallback renderCallback;
 
-    private double mouseSensitivity = 1;
+    private double rotateSensitivity = 0.25f;
     private double keyboardSensitivity = 2;
 
+    // ----- Конструктор ----- //
 
     public CanvasView() {
         super();
@@ -25,15 +26,13 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         setKeyBinds();
     }
 
-    public CanvasView(SceneRepository sceneStore) {
-        this();
-
-        this.sceneRepository = sceneStore;
-    }
+    // ----- Геттеры и Сеттеры ----- //
 
     public void setSceneRepository(SceneRepository sceneRepository) {
         this.sceneRepository = sceneRepository;
     }
+
+    // ----- Настройки ----- //
 
     private void setKeyBinds() {
         ActionMap actionMap = getActionMap();
@@ -108,11 +107,9 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         int curY = e.getY();
 
         Camera camera = sceneRepository.getCamera();
-        camera.moveX((curX - oldX));
-        camera.moveY((curY - oldY));
+        camera.rotateX((curX - oldX) * rotateSensitivity);
+        camera.rotateY((curY - oldY) * rotateSensitivity);
 
-        System.out.println("dragging: from " + oldX + ", " + oldY + " to " + curX + ", " + curY);
-        System.out.println("\tCamera: " + camera.getX() + ", " + camera.getY());
         oldX = curX;
         oldY = curY;
 

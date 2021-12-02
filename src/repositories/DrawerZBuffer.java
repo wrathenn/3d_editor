@@ -56,7 +56,7 @@ public class DrawerZBuffer {
     public void clearBuffer() {
         for (int i = 0; i < width; i++) {
             for (int k = 0; k < height; k++) {
-                zBuffer[i][k] = Integer.MAX_VALUE;
+                zBuffer[i][k] = Integer.MIN_VALUE;
             }
         }
     }
@@ -140,7 +140,7 @@ public class DrawerZBuffer {
     private void drawPixel(int x, int y, double z, Color c) {
         canvas.setColor(c);
 
-        if (zBuffer[x][y] > z) {
+        if (zBuffer[x][y] < z) {
             zBuffer[x][y] = z;
             canvas.drawLine(x, y, x, y);
         }
