@@ -56,7 +56,7 @@ public class DrawerZBuffer {
     public void clearBuffer() {
         for (int i = 0; i < width; i++) {
             for (int k = 0; k < height; k++) {
-                zBuffer[i][k] = Integer.MIN_VALUE;
+                zBuffer[i][k] = Integer.MAX_VALUE;
             }
         }
     }
@@ -79,11 +79,7 @@ public class DrawerZBuffer {
         return values;
     }
 
-    private void drawLine(Point p1, Point p2, Color c) {
-        canvas.setColor(Color.ORANGE);
-//        canvas.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
-//        /*
-        canvas.setColor(Color.GREEN);
+    private void drawLine(Point p1, Point p2, Color c, int thickness) {
         if (Math.abs(p2.getX() - p1.getX()) > Math.abs(p2.getY() - p1.getY())) {
             // Прямая ближе к горизонтальной
             if (p1.getX() > p2.getX()) {
@@ -99,7 +95,7 @@ public class DrawerZBuffer {
                 int xt = (int) x;
                 int y = (int) valuesY[i];
                 double z = valuesZ[i];
-//                canvas.drawLine(xt, y, xt, y);
+//                drawThickness(xt, y, z, c, thickness);
                 drawPixelCheck(xt, y, z, c);
             }
         } else {
@@ -116,7 +112,7 @@ public class DrawerZBuffer {
                 int yt = (int) y;
                 int x = (int) valuesY[i];
                 double z = valuesZ[i];
-//                canvas.drawLine(x, yt, x, yt);
+//                drawThickness(x, yt, z, c, thickness);
                 drawPixelCheck(x, yt, z, c);
             }
         }
@@ -138,21 +134,34 @@ public class DrawerZBuffer {
     }
 
     private void drawPixel(int x, int y, double z, Color c) {
-        canvas.setColor(c);
-
-        if (zBuffer[x][y] < z) {
+        if (zBuffer[x][y] > z) {
             zBuffer[x][y] = z;
+
+            canvas.setColor(c);
             canvas.drawLine(x, y, x, y);
         }
-//        canvas.drawLine(x, y, x, y);
+    }
+
+    private void drawThickness(int x, int y, double z, Color c, int thickness) {
+        if (zBuffer[x][y] > z) {
+            zBuffer[x][y] = z;
+            canvas.setColor(c);
+            int leftX = x - thickness / 2 - thickness % 2;
+            int rightX = x + thickness / 2 - 1;
+            int upY = y - thickness / 2 - thickness % 2;
+            int downY = y + thickness / 2 - 1;
+            System.out.printf("Thickk - %d %d %d %d\n", leftX, rightX, upY, downY);
+
+            for (int i = leftX; i <= rightX; i++) {
+                for (int k = upY; k <= downY; k++) {
+                    canvas.drawLine(i, k, i, k);
+                }
+            }
+        }
     }
 
     public void transformPointToCameraCoordinates(PointDraw point) {
         camera.transformPointToCameraCoordinates(point);
-    }
-
-    public void transformPointToCameraScreen(PointDraw point) {
-        camera.transformPointToCameraScreen(point);
     }
 
     public void findViewerVector(PointDraw point) {
@@ -199,7 +208,7 @@ public class DrawerZBuffer {
             while (xzBegin.x < xzEnd.x) {
                 Color c1 = xzBegin.intensity.applyColor(polyColor);
 
-                drawPixelCheckX((int) xzBegin.x, currentY, xzBegin.z, c1);
+                drawPixelCheckX((int)Math.floor(xzBegin.x), currentY, xzBegin.z, c1);
 
                 xzBegin.x++;
                 xzBegin.z += dz;
@@ -218,7 +227,7 @@ public class DrawerZBuffer {
             edgeInfo.lenY--;
             edgeInfo.currentI.add(edgeInfo.dI);
 
-            if (edgeInfo.lenY <= 0) {
+            if (SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == 0 || SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == -1) {
                 activeList.remove(i);
                 i--;
             }
@@ -232,7 +241,7 @@ public class DrawerZBuffer {
         renderSortEdges(poly.getEdges(), infoList);
 
         // Проход по сканирующим строкам
-        int currentY = (int) infoList.getFirst().yBegin;
+        int currentY = (int) Math.floor(infoList.getFirst().yBegin);
         LinkedList<EdgeDrawInfo> activeList = new LinkedList<>();
         activeList.add(infoList.pop());
 

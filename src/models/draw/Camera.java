@@ -10,7 +10,7 @@ public class Camera {
     // ----- Переменные - позиция камеры ----- //
 
     public Vector position = new Vector(0, 0, 0);
-    public Vector target = new Vector(0, 0, 1);
+    public Vector target = new Vector(0, 0, -1);
 
     public Vector direction;
     public Vector right;
@@ -109,12 +109,16 @@ public class Camera {
     public void transformPointToCameraScreen(PointDraw point) {
         Point p = point.getPoint();
 
-        p.setY(p.getY() * this.screenDistance / p.getZ());
-        p.setX(p.getX() * this.screenDistance / p.getZ());
-//        p.setZ(this.screenDistance);
+        p.setY(p.getY() * screenDistance / p.getZ());
+        p.setX(p.getX() * screenDistance / p.getZ());
 
-        p.setX((int) (p.getX() + (this.screenWidth / 2)));
-        p.setY((int) (this.screenHeight / 2 - p.getY()));
+    }
+
+    public void transformPointToCanvas(PointDraw point) {
+        Point p = point.getPoint();
+
+        p.setX((int) (p.getX() + (screenWidth / 2)));
+        p.setY((int) (screenHeight / 2 - p.getY()));
     }
 
     // ----- Геттеры и Сеттеры ----- //

@@ -14,7 +14,9 @@ public class EdgeDrawInfo {
         PointDraw pBegin = new PointDraw(edge.getBegin());
         PointDraw pEnd = new PointDraw(edge.getEnd());
         camera.transformPointToCameraScreen(pBegin);
+        camera.transformPointToCanvas(pBegin);
         camera.transformPointToCameraScreen(pEnd);
+        camera.transformPointToCanvas(pEnd);
 
         if (pBegin.getY() < pEnd.getY()) {
             PointDraw temp = pBegin;

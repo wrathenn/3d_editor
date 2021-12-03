@@ -95,17 +95,16 @@ public class SceneRepository {
 
         ArrayList<Polygon> polys = new ArrayList<>(Arrays.asList(
                 new Polygon(p1, Color.red),
-                new Polygon(p2, Color.red),
-                new Polygon(p3, Color.red),
-                new Polygon(p4, Color.red),
-                new Polygon(p5, Color.red),
-                new Polygon(p6, Color.red)
+                new Polygon(p2, Color.blue),
+                new Polygon(p3, Color.magenta),
+                new Polygon(p4, Color.orange),
+                new Polygon(p5, Color.green),
+                new Polygon(p6, Color.cyan)
         ));
 
         points.addAll(ps);
         edges.addAll(es);
         polygons.addAll(polys);
-
     }
 
     private void testComplex() {
@@ -134,61 +133,12 @@ public class SceneRepository {
 
     public SceneRepository() {
         points = new ArrayList<>();
-        {
-//            // Кубик
-//            points.add(new Point("M1", -50, 50, 0));
-//            points.add(new Point("M2", 50, 50, 0));
-//            points.add(new Point("M3", 50, -50, 0));
-//            points.add(new Point("M4", -50, -50, 0));
-//            points.add(new Point("M5", -50, 50, 100));
-//            points.add(new Point("M6", 50, 50, 100));
-//            points.add(new Point("M7", 50, -50, 100));
-//            points.add(new Point("M8", -50, -50, 100));
-            // треугольник
-//            points.add(new Point("M1", 0, 250, 10));
-//            points.add(new Point("M2", -250, 60, 25));
-//            points.add(new Point("M3", 200, 0, 75));
-//            points.add(new Point("M4", 0, -80, 150));
-        }
         edges = new ArrayList<>();
-        {
-//            // Кубик
-//            edges.add(new Edge(points.get(0), points.get(1)));
-//            edges.add(new Edge(points.get(1), points.get(2)));
-//            edges.add(new Edge(points.get(2), points.get(3)));
-//            edges.add(new Edge(points.get(3), points.get(0)));
-//
-//            edges.add(new Edge(points.get(0), points.get(4)));
-//            edges.add(new Edge(points.get(1), points.get(5)));
-//            edges.add(new Edge(points.get(2), points.get(6)));
-//            edges.add(new Edge(points.get(3), points.get(7)));
-//
-//
-//            edges.add(new Edge(points.get(4), points.get(5)));
-//            edges.add(new Edge(points.get(5), points.get(6)));
-//            edges.add(new Edge(points.get(6), points.get(7)));
-//            edges.add(new Edge(points.get(7), points.get(4)));
-
-//            edges.add(new Edge(points.get(0), points.get(1))); // 0
-//            edges.add(new Edge(points.get(0), points.get(2))); // 1
-//
-//            edges.add(new Edge(points.get(1), points.get(2))); // 2
-//
-//            edges.add(new Edge(points.get(1), points.get(3))); // 3
-//            edges.add(new Edge(points.get(2), points.get(3))); // 4
-        }
         polygons = new ArrayList<>();
-        {
-//            polygons.add(new Polygon(
-//                    new ArrayList<Edge>(Arrays.asList(edges.get(0), edges.get(1), edges.get(2))), Color.blue)
-//            );
-//            polygons.add(new Polygon(
-//                    new ArrayList<Edge>(Arrays.asList(edges.get(2), edges.get(3), edges.get(4))), Color.red)
-//            );
-        }
 
-//        addCube();
-        testComplex();
+
+        addCube();
+//        testComplex();
         camera = new Camera();
     }
 

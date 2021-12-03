@@ -136,7 +136,6 @@ public class DrawController {
         }
     }
 
-
     public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
         drawerVisitor.setSize(camera.getScreenWidth(), camera.getScreenHeight());
         drawerVisitor.clearBuffer();
