@@ -1,6 +1,8 @@
 package exceptions;
 
-public class NotExistedNameException extends Exception {
+import java.io.IOException;
+
+public class NotExistedNameException extends IOException {
     public NotExistedNameException(String message) {
         super(message);
     }

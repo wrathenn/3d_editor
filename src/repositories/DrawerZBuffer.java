@@ -205,12 +205,15 @@ public class DrawerZBuffer {
             double dz = (xzEnd.z - xzBegin.z) / (xzEnd.x - xzBegin.x);
             Intensity dI = xzEnd.intensity.minus(xzBegin.intensity).divide(xzEnd.x - xzBegin.x);
 
-            while (xzBegin.x < xzEnd.x) {
+            int xb = (int) Math.round(xzBegin.x);
+            int xe = (int) Math.round(xzEnd.x);
+
+            while (xb < xe) {
                 Color c1 = xzBegin.intensity.applyColor(polyColor);
 
-                drawPixelCheckX((int)Math.floor(xzBegin.x), currentY, xzBegin.z, c1);
+                drawPixelCheckX(xb, currentY, xzBegin.z, c1);
 
-                xzBegin.x++;
+                xb++;
                 xzBegin.z += dz;
                 xzBegin.intensity.add(dI);
             }
@@ -236,12 +239,17 @@ public class DrawerZBuffer {
 
     public void drawPolygon(PolygonDraw poly) {
         // В каждом ребре начало будет выше по Y, чем конец
-        SortedLinkedList<EdgeDrawInfo> infoList = new SortedLinkedList<>((o1, o2) ->
-                SharedFunctions.doubleCompare(o2.yBegin, o1.yBegin));
+        SortedLinkedList<EdgeDrawInfo> infoList = new SortedLinkedList<>((o1, o2) -> {
+            int res1 = SharedFunctions.doubleCompare(o2.yBegin, o1.yBegin);
+            if (res1 == 0) {
+                return SharedFunctions.doubleCompare(o2.yBegin - o2.lenY, o1.yBegin - o1.lenY);
+            }
+            return res1;
+        });
         renderSortEdges(poly.getEdges(), infoList);
 
         // Проход по сканирующим строкам
-        int currentY = (int) Math.floor(infoList.getFirst().yBegin);
+        int currentY = (int) Math.round(infoList.getFirst().yBegin);
         LinkedList<EdgeDrawInfo> activeList = new LinkedList<>();
         activeList.add(infoList.pop());
 

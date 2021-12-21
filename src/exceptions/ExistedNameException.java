@@ -1,6 +1,8 @@
 package exceptions;
 
-public class ExistedNameException extends Exception {
+import java.io.IOException;
+
+public class ExistedNameException extends IOException {
     public ExistedNameException(String message) {
         super(message);
     }

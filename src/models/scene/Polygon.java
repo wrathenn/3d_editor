@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Polygon {
     private ArrayList<Edge> edges;
@@ -25,7 +26,7 @@ public class Polygon {
         for (int i = 1; i < points.length; i++) {
             edges.add(new Edge(points[i - 1], points[i]));
         }
-        edges.add(new Edge(points[0], points[points.length - 1]));
+        edges.add(new Edge(points[points.length - 1], points[0]));
 
         color = c;
     }
@@ -86,5 +87,11 @@ public class Polygon {
         edges.remove(max);
         edges.add(max, newEdge);
         edges.remove(min);
+    }
+
+    @Override
+    public String toString() {
+        String es = edges.stream().map(Edge::toString).collect(Collectors.joining(","));
+        return String.format("Polygon{edges=[%s], color=%s}", es, color);
     }
 }

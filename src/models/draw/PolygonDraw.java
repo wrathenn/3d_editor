@@ -1,6 +1,7 @@
 package models.draw;
 
 import libs.SharedFunctions;
+import models.scene.Edge;
 import models.scene.Point;
 import models.scene.Vector;
 
@@ -16,6 +17,16 @@ public class PolygonDraw {
 
     public PolygonDraw(ArrayList<EdgeDraw> edges, Color color) {
         this.edges = edges;
+        this.color = color;
+    }
+
+    public PolygonDraw(PointDraw[] points, Color color) {
+        edges = new ArrayList<EdgeDraw>();
+        for (int i = 0; i < points.length - 1; i++) {
+            edges.add(new EdgeDraw(points[i], points[i + 1]));
+        }
+        edges.add(new EdgeDraw(points[points.length - 1], points[0]));
+
         this.color = color;
     }
 

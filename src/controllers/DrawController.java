@@ -1,5 +1,6 @@
 package controllers;
 
+import libs.HashMapUnique;
 import models.draw.Camera;
 import models.draw.EdgeDraw;
 import models.draw.PointDraw;
@@ -12,7 +13,7 @@ import repositories.DrawerZBuffer;
 import repositories.SceneRepository;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 public class DrawController {
@@ -65,29 +66,23 @@ public class DrawController {
     }
 
     private void drawCopy(SceneRepository repo,
-                          ArrayList<PointDraw> pointsToDraw,
-                          ArrayList<EdgeDraw> edgesToDraw,
-                          ArrayList<PolygonDraw> polygonsToDraw) {
+                          HashMap<String, PointDraw> pointsToDraw,
+                          HashMap<UUID, PolygonDraw> polygonsToDraw) {
 
-        for (Point p : repo.getPoints()) {
-            pointsToDraw.add(new PointDraw(p));
+        for (Map.Entry<String, Point> pointEntry : repo.getPoints().entrySet()) {
+            pointsToDraw.put(pointEntry.getKey(), new PointDraw(pointEntry.getValue()));
         }
 
-        for (Edge e : repo.getEdges()) {
-            PointDraw begin = findPointDrawByName(e.getBegin().getNameID(), pointsToDraw);
-            PointDraw end = findPointDrawByName(e.getEnd().getNameID(), pointsToDraw);
-            edgesToDraw.add(new EdgeDraw(begin, end));
-        }
+        for (Map.Entry<UUID, Polygon> polyEntry : repo.getPolygons().entrySet()) {
+            Polygon oldPoly = polyEntry.getValue();
 
-        for (Polygon p : repo.getPolygons()) {
-            ArrayList<EdgeDraw> edgesForNewPoly = new ArrayList<>();
-
-            for (Edge e : p.getEdges()) {
-                EdgeDraw newEdge = findEdgeDrawByPointNames(e, edgesToDraw);
-                edgesForNewPoly.add(newEdge);
+            ArrayList<Edge> oldEdges = oldPoly.getEdges();
+            PointDraw[] points = new PointDraw[oldPoly.getEdges().size()];
+            for (int i = 0; i < oldEdges.size(); i++) {
+                points[i] = pointsToDraw.get(oldEdges.get(i).getBegin().getNameID());
             }
 
-            polygonsToDraw.add(new PolygonDraw(edgesForNewPoly, p.getColor()));
+            polygonsToDraw.put(polyEntry.getKey(), new PolygonDraw(points, oldPoly.getColor()));
         }
     }
 
@@ -113,16 +108,15 @@ public class DrawController {
         }
     }
 
-    private void drawPreprocessing(ArrayList<PointDraw> points,
-                                   ArrayList<PolygonDraw> polygons) {
+    private void drawPreprocessing(HashMap<String, PointDraw> points,
+                                   HashMap<UUID, PolygonDraw> polygons) {
 
-        for (PointDraw p : points) {
+        for (PointDraw p : points.values()) {
             drawerVisitor.transformPointToCameraCoordinates(p);
-
             drawerVisitor.findViewerVector(p);
         }
 
-        for (PolygonDraw poly : polygons) {
+        for (PolygonDraw poly : polygons.values()) {
             poly.findNormalLine();
             // Найти цвет каждой точки, не находить, если уже найден
             findPointsColorInPolygon(poly);
@@ -132,7 +126,6 @@ public class DrawController {
 
             // Очистить цвет каждой точки
             clearPointsColorInPolygon(poly);
-
         }
     }
 
@@ -143,11 +136,10 @@ public class DrawController {
         drawerVisitor.setCanvas(canvas);
         drawerVisitor.setCamera(camera);
 
-        ArrayList<PointDraw> pointsToDraw = new ArrayList<>();
-        ArrayList<EdgeDraw> edgesToDraw = new ArrayList<>();
-        ArrayList<PolygonDraw> polygonsToDraw = new ArrayList<>();
+        HashMap<String, PointDraw> pointsToDraw = new HashMap<>();
+        HashMap<UUID, PolygonDraw> polygonsToDraw = new HashMap<>();
 
-        drawCopy(sceneRepository, pointsToDraw, edgesToDraw, polygonsToDraw);
+        drawCopy(sceneRepository, pointsToDraw, polygonsToDraw);
 
         canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
         camera.createLookAt();

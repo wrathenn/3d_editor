@@ -5,7 +5,7 @@ import models.scene.Point;
 import models.scene.Vector;
 
 public class Camera {
-    private static final Vector generalUp = new Vector(0, 1, 0);
+    private static Vector generalUp = new Vector(0, 1, 0);
 
     // ----- Переменные - позиция камеры ----- //
 
@@ -31,6 +31,14 @@ public class Camera {
 
     public Camera() {
         createLookAt();
+    }
+
+    public Camera(Vector position, Vector target, double yaw, double pitch, int screenDistance) {
+        this.position = position;
+        this.target = target;
+        this.yaw = yaw;
+        this.pitch = pitch;
+        this.screenDistance = screenDistance;
     }
 
     // ----- Методы ----- //

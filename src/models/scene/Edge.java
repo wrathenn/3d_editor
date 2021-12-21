@@ -33,6 +33,6 @@ public class Edge {
 
     @Override
     public String toString() {
-        return "Edge\n\tpBegin:\t" + begin.toString() + "\n\tpEnd:\t" + end.toString();
+        return String.format("Edge{begin=%s, end=%s}", begin, end);
     }
 }
