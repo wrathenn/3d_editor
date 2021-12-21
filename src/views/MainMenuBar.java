@@ -1,15 +1,14 @@
 package views;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionListener;
 
-public class CustomMenuBar extends JMenuBar {
+public class MainMenuBar extends JMenuBar {
     private JMenuItem open;
     private JMenuItem save;
     private JMenuItem exit;
 
-    public CustomMenuBar() throws HeadlessException {
+    public MainMenuBar() {
         super();
         add(createFileMenu());
     }

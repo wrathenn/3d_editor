@@ -15,13 +15,13 @@ public class DrawerZBuffer {
     protected Camera camera;
 
     private double[][] zBuffer;
+    private UUID[][] polyReferences;
 
     private final Intensity diffusionI = new Intensity(0.5, 0.5, 0.5);
     private final Intensity backGroundI = new Intensity(0.35, 0.35, 0.35);
 
     private int width;
     private int height;
-    private Object IllegalArgumentException;
 
     public DrawerZBuffer(int width, int height) {
         super();
@@ -48,18 +48,13 @@ public class DrawerZBuffer {
     public void setSize(int width, int height) {
         if (this.width < width || this.height < height) {
             zBuffer = new double[width][height];
+            polyReferences = new UUID[width][height];
         }
         this.width = width;
         this.height = height;
     }
 
-    public void clearBuffer() {
-        for (int i = 0; i < width; i++) {
-            for (int k = 0; k < height; k++) {
-                zBuffer[i][k] = Integer.MAX_VALUE;
-            }
-        }
-    }
+    // ----- Методы для канваса ----- //
 
     private double[] interpolate(double i0, double d0, double i1, double d1) {
         if (i0 == i1) {
@@ -95,7 +90,6 @@ public class DrawerZBuffer {
                 int xt = (int) x;
                 int y = (int) valuesY[i];
                 double z = valuesZ[i];
-//                drawThickness(xt, y, z, c, thickness);
                 drawPixelCheck(xt, y, z, c);
             }
         } else {
@@ -112,11 +106,16 @@ public class DrawerZBuffer {
                 int yt = (int) y;
                 int x = (int) valuesY[i];
                 double z = valuesZ[i];
-//                drawThickness(x, yt, z, c, thickness);
                 drawPixelCheck(x, yt, z, c);
             }
         }
-//         */
+    }
+
+    private void drawPixelCheck(int x, int y, double z, Color c, UUID polyId) {
+        if (x >= width || x < 0 || y >= height || y < 0) {
+            return;
+        }
+        drawPixel(x, y, z, c, polyId);
     }
 
     private void drawPixelCheck(int x, int y, double z, Color c) {
@@ -126,11 +125,28 @@ public class DrawerZBuffer {
         drawPixel(x, y, z, c);
     }
 
+    private void drawPixelCheckX(int x, int y, double z, Color c, UUID polyId) {
+        if (x >= width || x < 0) {
+            return;
+        }
+        drawPixel(x, y, z, c, polyId);
+    }
+
     private void drawPixelCheckX(int x, int y, double z, Color c) {
         if (x >= width || x < 0) {
             return;
         }
         drawPixel(x, y, z, c);
+    }
+
+    private void drawPixel(int x, int y, double z, Color c, UUID polyId) {
+        if (zBuffer[x][y] > z) {
+            zBuffer[x][y] = z;
+            polyReferences[x][y] = polyId;
+
+            canvas.setColor(c);
+            canvas.drawLine(x, y, x, y);
+        }
     }
 
     private void drawPixel(int x, int y, double z, Color c) {
@@ -142,26 +158,34 @@ public class DrawerZBuffer {
         }
     }
 
-    private void drawThickness(int x, int y, double z, Color c, int thickness) {
-        if (zBuffer[x][y] > z) {
-            zBuffer[x][y] = z;
-            canvas.setColor(c);
-            int leftX = x - thickness / 2 - thickness % 2;
-            int rightX = x + thickness / 2 - 1;
-            int upY = y - thickness / 2 - thickness % 2;
-            int downY = y + thickness / 2 - 1;
-            System.out.printf("Thickk - %d %d %d %d\n", leftX, rightX, upY, downY);
+    public Color setColor(Color c) {
+        Color old = canvas.getColor();
+        canvas.setColor(c);
+        return old;
+    }
 
-            for (int i = leftX; i <= rightX; i++) {
-                for (int k = upY; k <= downY; k++) {
-                    canvas.drawLine(i, k, i, k);
-                }
+    // ----- Методы для отрисовки ----- //
+
+    // ----- Буферы
+
+    public void clearBuffer() {
+        for (int i = 0; i < width; i++) {
+            for (int k = 0; k < height; k++) {
+                zBuffer[i][k] = Integer.MAX_VALUE;
+                polyReferences[i][k] = null;
             }
         }
     }
 
+    public UUID getPolyId(int x, int y) {
+        return polyReferences[x][y];
+    }
+
+    // ----- Работа с точкой
+
     public void transformPointToCameraCoordinates(PointDraw point) {
-        camera.transformPointToCameraCoordinates(point);
+        Point p = point.getPoint();
+        p.timesRightEquals(camera.lookAt);
     }
 
     public void findViewerVector(PointDraw point) {
@@ -180,64 +204,9 @@ public class DrawerZBuffer {
         point.setIntensity(intensity);
     }
 
-    private void renderSortEdges(List<EdgeDraw> edges, SortedLinkedList<EdgeDrawInfo> infoList) {
-        for (EdgeDraw e : edges) {
-            EdgeDrawInfo newInfo = new EdgeDrawInfo(e, camera);
-            infoList.add(newInfo);
-        }
-    }
+    // ----- Полигон
 
-
-    private void drawXZList(SortedLinkedList<XZElement> xzList, int currentY, Color polyColor) {
-        if (currentY >= height || currentY < 0) {
-            return;
-        }
-
-        while (xzList.size() != 0) {
-            XZElement xzBegin = xzList.pop();
-            XZElement xzEnd;
-            if (xzList.size() == 0) {
-                xzEnd = xzBegin;
-            } else {
-                xzEnd = xzList.pop();
-            }
-
-            double dz = (xzEnd.z - xzBegin.z) / (xzEnd.x - xzBegin.x);
-            Intensity dI = xzEnd.intensity.minus(xzBegin.intensity).divide(xzEnd.x - xzBegin.x);
-
-            int xb = (int) Math.round(xzBegin.x);
-            int xe = (int) Math.round(xzEnd.x);
-
-            while (xb < xe) {
-                Color c1 = xzBegin.intensity.applyColor(polyColor);
-
-                drawPixelCheckX(xb, currentY, xzBegin.z, c1);
-
-                xb++;
-                xzBegin.z += dz;
-                xzBegin.intensity.add(dI);
-            }
-        }
-    }
-
-    private void activeListStep(List<EdgeDrawInfo> activeList) {
-        for (int i = 0; i < activeList.size(); i++) {
-            EdgeDrawInfo edgeInfo = activeList.get(i);
-            edgeInfo.x += edgeInfo.dx;
-            edgeInfo.z += edgeInfo.dz;
-
-            edgeInfo.yBegin--;
-            edgeInfo.lenY--;
-            edgeInfo.currentI.add(edgeInfo.dI);
-
-            if (SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == 0 || SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == -1) {
-                activeList.remove(i);
-                i--;
-            }
-        }
-    }
-
-    public void drawPolygon(PolygonDraw poly) {
+    public void drawPolygon(PolygonDraw poly, UUID polyId) {
         // В каждом ребре начало будет выше по Y, чем конец
         SortedLinkedList<EdgeDrawInfo> infoList = new SortedLinkedList<>((o1, o2) -> {
             int res1 = SharedFunctions.doubleCompare(o2.yBegin, o1.yBegin);
@@ -268,9 +237,75 @@ public class DrawerZBuffer {
                 xzList.add(new XZElement(edgeInfo));
             }
 
-            drawXZList(xzList, currentY, polyColor);
+            drawXZList(xzList, currentY, polyColor, polyId);
             activeListStep(activeList);
             currentY--;
         }
+    }
+
+    private void renderSortEdges(List<EdgeDraw> edges, SortedLinkedList<EdgeDrawInfo> infoList) {
+        for (EdgeDraw e : edges) {
+            EdgeDrawInfo newInfo = new EdgeDrawInfo(e, camera);
+            infoList.add(newInfo);
+        }
+    }
+
+    private void drawXZList(SortedLinkedList<XZElement> xzList, int currentY, Color polyColor, UUID polyId) {
+        if (currentY >= height || currentY < 0) {
+            return;
+        }
+
+        while (xzList.size() != 0) {
+            XZElement xzBegin = xzList.pop();
+            XZElement xzEnd;
+            if (xzList.size() == 0) {
+                xzEnd = xzBegin;
+            } else {
+                xzEnd = xzList.pop();
+            }
+
+            double dz = (xzEnd.z - xzBegin.z) / (xzEnd.x - xzBegin.x);
+            Intensity dI = xzEnd.intensity.minus(xzBegin.intensity).divide(xzEnd.x - xzBegin.x);
+
+            int xb = (int) Math.round(xzBegin.x);
+            int xe = (int) Math.round(xzEnd.x);
+
+            while (xb < xe) {
+                Color c1 = xzBegin.intensity.applyColor(polyColor);
+
+                drawPixelCheckX(xb, currentY, xzBegin.z, c1, polyId);
+
+                xb++;
+                xzBegin.z += dz;
+                xzBegin.intensity.add(dI);
+            }
+        }
+    }
+
+    private void activeListStep(List<EdgeDrawInfo> activeList) {
+        for (int i = 0; i < activeList.size(); i++) {
+            EdgeDrawInfo edgeInfo = activeList.get(i);
+            edgeInfo.x += edgeInfo.dx;
+            edgeInfo.z += edgeInfo.dz;
+
+            edgeInfo.yBegin--;
+            edgeInfo.lenY--;
+            edgeInfo.currentI.add(edgeInfo.dI);
+
+            if (SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == 0 || SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == -1) {
+                activeList.remove(i);
+                i--;
+            }
+        }
+    }
+
+    // ----- Для интерфейса
+
+    public void drawPointName(PointDraw point) {
+        PointDraw newP = new PointDraw(point);
+        camera.transformPointToCameraScreen(newP);
+        camera.transformPointToCanvas(newP);
+
+        canvas.drawString(point.getNameID(), (int) Math.round(newP.getX()), (int) Math.round(newP.getY()));
     }
 }

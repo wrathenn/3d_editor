@@ -3,18 +3,17 @@ import controllers.SceneController;
 import exceptions.ExistedNameException;
 import exceptions.NotExistedNameException;
 import models.draw.Camera;
-import models.scene.Edge;
 import models.scene.Point;
 import models.scene.Polygon;
 import repositories.SceneRepository;
 import repositories.DrawerZBuffer;
 import views.ButtonPanel;
-import views.CustomMenuBar;
-import views.callbacks.RenderCallback;
-import views.user_input.AddEdgeView;
+import views.MainMenuBar;
+import views.PolygonEditor;
 import views.user_input.AddPointView;
 import views.CanvasView;
 import views.user_input.AddPolygonView;
+import views.user_input.PolygonEditorMenuBar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,44 +23,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class MainApplication extends JFrame {
     private final int DEFAULT_WIDTH = 960;
     private final int DEFAULT_HEIGHT = 640;
 
-    private final int BUTTON_PANEL_WIDTH = 100;
+    private final int BUTTON_PANEL_WIDTH = 250;
 
-    ButtonPanel buttonPanel;
-    CanvasView canvas;
-    CustomMenuBar menu;
+    private ButtonPanel buttonPanel;
+    private CanvasView canvas;
+    private MainMenuBar menu;
 
     // architecture stuff
     private SceneController sceneController;
     private DrawController drawController;
-
-    private void initGUI() {
-        setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        menu = new CustomMenuBar();
-        setJMenuBar(menu);
-
-        Container pane = getContentPane();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
-
-        buttonPanel = new ButtonPanel();
-        buttonPanel.setMaximumSize(new Dimension(BUTTON_PANEL_WIDTH, DEFAULT_HEIGHT));
-        pane.add(buttonPanel);
-
-        canvas = new CanvasView();
-        canvas.setMaximumSize(new Dimension(DEFAULT_WIDTH - BUTTON_PANEL_WIDTH, DEFAULT_HEIGHT));
-        pane.add(canvas);
-    }
-
-    private void changeSceneRepository(SceneRepository newRepo) {
-        sceneController.setSceneRepository(newRepo);
-        canvas.setSceneRepository(newRepo);
-    }
 
     public MainApplication(String title) {
         super(title);
@@ -82,6 +58,45 @@ public class MainApplication extends JFrame {
 
         setButtonPanelCallbacks();
         setMenuCallbacks();
+        setCanvasCallbacks();
+    }
+
+    private void initGUI() {
+        setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        menu = new MainMenuBar();
+        setJMenuBar(menu);
+
+        Container pane = getContentPane();
+        pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
+
+        buttonPanel = new ButtonPanel();
+        buttonPanel.setMaximumSize(new Dimension(BUTTON_PANEL_WIDTH, DEFAULT_HEIGHT));
+        pane.add(buttonPanel);
+
+        canvas = new CanvasView();
+        canvas.setMaximumSize(new Dimension(DEFAULT_WIDTH - BUTTON_PANEL_WIDTH, DEFAULT_HEIGHT));
+        pane.add(canvas);
+    }
+
+    private void changeSceneRepository(SceneRepository newRepo) {
+        sceneController.setSceneRepository(newRepo);
+        canvas.setSceneRepository(newRepo);
+    }
+
+    private void setCanvasCallbacks() {
+        canvas.setSelectPolyCallback((x, y) -> {
+            UUID id = drawController.getPolyId(x, y);
+            if (id != null) {
+                drawController.setSelectedPolyId(id);
+                System.out.println("log - Selected new Poly with ID=" + id);
+            } else {
+                drawController.setSelectedPolyId(null);
+                System.out.println("log - Unselected Poly");
+            }
+            canvas.renderCallback.render();
+        });
     }
 
     private void setMenuCallbacks() {
@@ -129,10 +144,27 @@ public class MainApplication extends JFrame {
                 }
 
                 Point[] pArr = new Point[points.size()];
-                Polygon newPoly = new Polygon(points.toArray(pArr), new Color(200, 200, 200));
+                Polygon newPoly = new Polygon(points.toArray(pArr), new Color(0, 256, 256));
                 sceneController.add(newPoly);
             });
 
+            frame.setVisible(true);
+        });
+
+        buttonPanel.setEditPolygonActionListener(e -> {
+            UUID selected = drawController.getSelectedPolyId();
+            if (selected == null) {
+                System.out.println("log - Не выбран многоугольник"); // TODO: errorview
+                return;
+            }
+
+            Polygon polygon = sceneController.getPolygonById(selected);
+            if (polygon == null) {
+                System.out.println("log - Выбран уже не существующий многоугольник"); // TODO: errorview
+                return;
+            }
+
+            PolygonEditor frame = new PolygonEditor(polygon);
             frame.setVisible(true);
         });
     }

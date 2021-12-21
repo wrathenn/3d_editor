@@ -2,16 +2,19 @@ package views;
 
 import models.draw.Camera;
 import repositories.SceneRepository;
+import views.callbacks.SelectPolyCallback;
 import views.callbacks.RenderCallback;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.UUID;
 
 public class CanvasView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
-
     public SceneRepository sceneRepository;
+
     public RenderCallback renderCallback;
+    private SelectPolyCallback selectPolyCallback;
 
     private double rotateSensitivity = 0.25f;
     private double keyboardSensitivity = 2;
@@ -32,6 +35,9 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         this.sceneRepository = sceneRepository;
     }
 
+    public void setSelectPolyCallback(SelectPolyCallback selectPolyCallback) {
+        this.selectPolyCallback = selectPolyCallback;
+    }
     // ----- Настройки ----- //
 
     private void setKeyBinds() {
@@ -90,12 +96,8 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
     }
 
     @Override
-    public void paintComponent(Graphics g) {
-    }
-
-    @Override
     public void mouseClicked(MouseEvent e) {
-
+        selectPolyCallback.callback(e.getX(), e.getY());
     }
 
     private int oldX = 0;

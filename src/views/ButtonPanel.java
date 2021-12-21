@@ -12,26 +12,33 @@ public class ButtonPanel extends JPanel {
     private JButton drawButton;
     private JButton addPointButton;
     private JButton addPolygonButton;
+    private JButton editPolygon;
 
     public ButtonPanel() {
         super();
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        {
-            drawButton = new JButton("draw");
-            drawButton.setSize(drawButton.getMaximumSize());
-            this.add(drawButton);
-        }
-        {
-            addPointButton = new JButton("Add point");
-            addPointButton.setSize(this.getSize().width, 20);
-            this.add(addPointButton);
-        }
-        {
-            addPolygonButton = new JButton("Add Polygon");
-            addPolygonButton.setSize(this.getSize().width, 20);
-            this.add(addPolygonButton);
-        }
-        this.setBackground(Color.gray);
+
+        drawButton = new JButton("draw");
+        drawButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        drawButton.setBackground(Color.ORANGE);
+        this.add(drawButton);
+
+        addPointButton = new JButton("Add point");
+        addPointButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        addPointButton.setBackground(Color.ORANGE);
+        this.add(addPointButton);
+
+        addPolygonButton = new JButton("Add Polygon");
+        addPolygonButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        addPolygonButton.setBackground(Color.ORANGE);
+        this.add(addPolygonButton);
+
+        editPolygon = new JButton("Редактировать");
+        editPolygon.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        editPolygon.setBackground(Color.ORANGE);
+        this.add(editPolygon);
+
+        this.setBackground(Color.black);
     }
 
     public void setDrawButtonCallback(RenderCallback callback) {
@@ -42,7 +49,11 @@ public class ButtonPanel extends JPanel {
         addPointButton.addActionListener(actionListener);
     }
 
-    public void setAddPolygonButtonActionListener(ActionListener actionListener){
+    public void setAddPolygonButtonActionListener(ActionListener actionListener) {
         addPolygonButton.addActionListener(actionListener);
+    }
+
+    public void setEditPolygonActionListener(ActionListener actionListener) {
+        editPolygon.addActionListener(actionListener);
     }
 }

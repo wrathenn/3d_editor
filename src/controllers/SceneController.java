@@ -13,6 +13,7 @@ import repositories.SceneRepository;
 
 import java.awt.*;
 import java.io.*;
+import java.util.UUID;
 
 public class SceneController {
 
@@ -32,6 +33,10 @@ public class SceneController {
 
     public SceneRepository getSceneRepository() {
         return sceneRepository;
+    }
+
+    public Polygon getPolygonById(UUID polyId) {
+        return sceneRepository.getPolygon(polyId);
     }
 
     // ----- Методы ----- //

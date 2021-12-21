@@ -7,6 +7,7 @@ import models.draw.Camera;
 import models.scene.Point;
 import models.scene.Edge;
 import models.scene.Polygon;
+import views.PolygonEditor;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -62,6 +63,10 @@ public class SceneRepository {
 
     public Point getPoint(String name) {
         return points.get(name);
+    }
+
+    public Polygon getPolygon(UUID id) {
+        return polygons.get(id);
     }
 
     public Camera getCamera() {

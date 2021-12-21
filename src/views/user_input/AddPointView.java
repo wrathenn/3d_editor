@@ -119,17 +119,14 @@ public class AddPointView extends JFrame {
         config.fill = GridBagConstraints.BOTH;
         pane.add(addButton, config);
 
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addCallback.callback(new Point(
-                        inputName.getText(),
-                        Float.parseFloat(inputX.getText()),
-                        Float.parseFloat(inputY.getText()),
-                        Float.parseFloat(inputZ.getText())
-                ));
-                dispose();
-            }
+        addButton.addActionListener(e -> {
+            addCallback.callback(new Point(
+                    inputName.getText(),
+                    Float.parseFloat(inputX.getText()),
+                    Float.parseFloat(inputY.getText()),
+                    Float.parseFloat(inputZ.getText())
+            ));
+            dispose();
         });
     }
 }

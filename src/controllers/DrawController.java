@@ -1,6 +1,5 @@
 package controllers;
 
-import libs.HashMapUnique;
 import models.draw.Camera;
 import models.draw.EdgeDraw;
 import models.draw.PointDraw;
@@ -17,52 +16,57 @@ import java.util.*;
 import java.util.List;
 
 public class DrawController {
-    private DrawerZBuffer drawerVisitor;
+    private DrawerZBuffer drawer;
+    private UUID selectedPolyId;
 
     // ----- Конструкторы ----- //
 
     public DrawController() {
     }
 
-    public DrawController(DrawerZBuffer drawerVisitor) {
-        this.drawerVisitor = drawerVisitor;
+    public DrawController(DrawerZBuffer drawer) {
+        this.drawer = drawer;
     }
 
     // ----- Сеттеры и Геттеры ----- //
 
-    public void setDrawerVisitor(DrawerZBuffer drawerVisitor) {
-        this.drawerVisitor = drawerVisitor;
+    public void setDrawer(DrawerZBuffer drawer) {
+        this.drawer = drawer;
     }
 
     public void setCanvas(Graphics canvas) {
-        this.drawerVisitor.setCanvas(canvas);
+        this.drawer.setCanvas(canvas);
     }
 
     public void setCamera(Camera camera) {
-        this.drawerVisitor.setCamera(camera);
+        this.drawer.setCamera(camera);
+    }
+
+    public void setSelectedPolyId(UUID selectedPolyId) {
+        this.selectedPolyId = selectedPolyId;
+    }
+
+    public UUID getSelectedPolyId() {
+        return selectedPolyId;
     }
 
     // ----- Нормальные методы ----- //
 
-    private @Nullable PointDraw findPointDrawByName(String name, List<PointDraw> pointList) {
-        for (PointDraw p : pointList) {
-            if (name.equals(p.getNameID())) {
-                return p;
-            }
-        }
-        return null;
-    }
+    public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
+        drawer.setSize(camera.getScreenWidth(), camera.getScreenHeight());
+        drawer.clearBuffer();
 
-    private @Nullable EdgeDraw findEdgeDrawByPointNames(Edge edge, List<EdgeDraw> edgeList) {
-        for (EdgeDraw e : edgeList) {
-            if (edge.getBegin().getNameID().equals(e.getBegin().getNameID()) && edge.getEnd().getNameID().equals(e.getEnd().getNameID())) {
-                return e;
-            }
-            if (edge.getBegin().getNameID().equals(e.getEnd().getNameID()) && edge.getEnd().getNameID().equals(e.getBegin().getNameID())) {
-                return e;
-            }
-        }
-        return null;
+        drawer.setCanvas(canvas);
+        drawer.setCamera(camera);
+
+        HashMap<String, PointDraw> pointsToDraw = new HashMap<>();
+        HashMap<UUID, PolygonDraw> polygonsToDraw = new HashMap<>();
+
+        drawCopy(sceneRepository, pointsToDraw, polygonsToDraw);
+
+        canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
+        camera.createLookAt();
+        drawPreprocessing(pointsToDraw, polygonsToDraw);
     }
 
     private void drawCopy(SceneRepository repo,
@@ -86,13 +90,39 @@ public class DrawController {
         }
     }
 
+    private void drawPreprocessing(HashMap<String, PointDraw> points,
+                                   HashMap<UUID, PolygonDraw> polygons) {
+
+        for (PointDraw p : points.values()) {
+            drawer.transformPointToCameraCoordinates(p);
+            drawer.findViewerVector(p);
+            drawer.drawPointName(p);
+        }
+
+        for (Map.Entry<UUID, PolygonDraw> polyEntry : polygons.entrySet()) {
+            PolygonDraw poly = polyEntry.getValue();
+            poly.findNormalLine();
+            if (polyEntry.getKey() == selectedPolyId) {
+                poly.setColor(new Color(72,72,72,128));
+            }
+            // Найти цвет каждой точки, не находить, если уже найден
+            findPointsColorInPolygon(poly);
+
+            // Отрисовка полигона
+            drawer.drawPolygon(poly, polyEntry.getKey());
+
+            // Очистить цвет каждой точки
+            clearPointsColorInPolygon(poly);
+        }
+    }
+
     private void findPointsColorInPolygon(PolygonDraw p) {
         for (EdgeDraw e : p.getEdges()) {
             if (e.getBegin().getIntensity() == null) {
-                drawerVisitor.findPointColor(e.getBegin(), p.getNormalLine());
+                drawer.findPointColor(e.getBegin(), p.getNormalLine());
             }
             if (e.getEnd().getIntensity() == null) {
-                drawerVisitor.findPointColor(e.getEnd(), p.getNormalLine());
+                drawer.findPointColor(e.getEnd(), p.getNormalLine());
             }
         }
     }
@@ -108,41 +138,7 @@ public class DrawController {
         }
     }
 
-    private void drawPreprocessing(HashMap<String, PointDraw> points,
-                                   HashMap<UUID, PolygonDraw> polygons) {
-
-        for (PointDraw p : points.values()) {
-            drawerVisitor.transformPointToCameraCoordinates(p);
-            drawerVisitor.findViewerVector(p);
-        }
-
-        for (PolygonDraw poly : polygons.values()) {
-            poly.findNormalLine();
-            // Найти цвет каждой точки, не находить, если уже найден
-            findPointsColorInPolygon(poly);
-
-            // Отрисовка полигона
-            drawerVisitor.drawPolygon(poly);
-
-            // Очистить цвет каждой точки
-            clearPointsColorInPolygon(poly);
-        }
-    }
-
-    public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
-        drawerVisitor.setSize(camera.getScreenWidth(), camera.getScreenHeight());
-        drawerVisitor.clearBuffer();
-
-        drawerVisitor.setCanvas(canvas);
-        drawerVisitor.setCamera(camera);
-
-        HashMap<String, PointDraw> pointsToDraw = new HashMap<>();
-        HashMap<UUID, PolygonDraw> polygonsToDraw = new HashMap<>();
-
-        drawCopy(sceneRepository, pointsToDraw, polygonsToDraw);
-
-        canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
-        camera.createLookAt();
-        drawPreprocessing(pointsToDraw, polygonsToDraw);
+    public UUID getPolyId(int x, int y) {
+        return drawer.getPolyId(x, y);
     }
 }

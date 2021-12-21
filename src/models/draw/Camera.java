@@ -72,7 +72,6 @@ public class Camera {
         });
 
         lookAt = rotation.times(translation);
-        System.out.println(lookAt);
     }
 
     public void moveX(double mov) {
@@ -109,17 +108,11 @@ public class Camera {
         return viewVector;
     }
 
-    public void transformPointToCameraCoordinates(PointDraw point) {
-        Point p = point.getPoint();
-        p.timesRightEquals(lookAt);
-    }
-
     public void transformPointToCameraScreen(PointDraw point) {
         Point p = point.getPoint();
 
         p.setY(p.getY() * screenDistance / p.getZ());
         p.setX(p.getX() * screenDistance / p.getZ());
-
     }
 
     public void transformPointToCanvas(PointDraw point) {
