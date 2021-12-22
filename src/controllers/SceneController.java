@@ -105,10 +105,11 @@ public class SceneController {
         reader.readHeader("CAMERA:");
         Vector position = reader.readVector();
         Vector target = reader.readVector();
+        Vector up = reader.readVector();
         double yaw = reader.readDouble();
         double pitch = reader.readDouble();
         int screenDistance = reader.readInt();
-        Camera newCamera = new Camera(position, target, yaw, pitch, screenDistance);
+        Camera newCamera = new Camera(position, target, up, yaw, pitch, screenDistance);
         newRepo.setCamera(newCamera);
 
         return newRepo;

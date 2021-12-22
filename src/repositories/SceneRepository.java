@@ -1,18 +1,12 @@
 package repositories;
 
 import exceptions.ExistedNameException;
-import exceptions.NotExistedNameException;
 import libs.HashMapUnique;
 import models.draw.Camera;
 import models.scene.Point;
 import models.scene.Edge;
 import models.scene.Polygon;
-import views.PolygonEditor;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.UUID;
 
 public class SceneRepository {

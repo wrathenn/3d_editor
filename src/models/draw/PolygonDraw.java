@@ -21,7 +21,7 @@ public class PolygonDraw {
     }
 
     public PolygonDraw(PointDraw[] points, Color color) {
-        edges = new ArrayList<EdgeDraw>();
+        edges = new ArrayList<>();
         for (int i = 0; i < points.length - 1; i++) {
             edges.add(new EdgeDraw(points[i], points[i + 1]));
         }

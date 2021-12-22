@@ -5,14 +5,14 @@ import models.scene.Point;
 import models.scene.Vector;
 
 public class Camera {
-    private static Vector generalUp = new Vector(0, 1, 0);
+    private Vector generalUp = new Vector(0, 1, 0);
 
     // ----- Переменные - позиция камеры ----- //
 
     public Vector position = new Vector(0, 0, 0);
     public Vector target = new Vector(0, 0, -1);
 
-    public Vector direction;
+    public Vector forward;
     public Vector right;
     public Vector up;
 
@@ -33,9 +33,10 @@ public class Camera {
         createLookAt();
     }
 
-    public Camera(Vector position, Vector target, double yaw, double pitch, int screenDistance) {
+    public Camera(Vector position, Vector target, Vector up, double yaw, double pitch, int screenDistance) {
         this.position = position;
         this.target = target;
+        this.generalUp = up;
         this.yaw = yaw;
         this.pitch = pitch;
         this.screenDistance = screenDistance;
@@ -44,14 +45,14 @@ public class Camera {
     // ----- Методы ----- //
 
     private void findDirections() {
-        direction = position.minus(target);
-        direction.setX(Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
-        direction.setY(Math.sin(Math.toRadians(pitch)));
-        direction.setZ(Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
-        direction.normalizeEquals();
+        forward = position.minus(target).normalizeEquals();
+        forward.setX(Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
+        forward.setY(Math.sin(Math.toRadians(pitch)));
+        forward.setZ(Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
+        forward.normalizeEquals();
 
-        right = generalUp.cross(direction).normalizeEquals();
-        up = direction.cross(right);
+        right = generalUp.cross(forward).normalizeEquals();
+        up = forward.cross(right);
     }
 
     public void createLookAt() {
@@ -60,7 +61,7 @@ public class Camera {
         Matrix rotation = new Matrix(new double[][]{
                 {right.getX(), right.getY(), right.getZ(), 0},
                 {up.getX(), up.getY(), up.getZ(), 0},
-                {direction.getX(), direction.getY(), direction.getZ(), 0},
+                {forward.getX(), forward.getY(), forward.getZ(), 0},
                 {0, 0, 0, 1}
         });
 
@@ -115,9 +116,19 @@ public class Camera {
         p.setX(p.getX() * screenDistance / p.getZ());
     }
 
+    public void transformPointToCameraScreen(Point p) {
+        p.setY(p.getY() * screenDistance / p.getZ());
+        p.setX(p.getX() * screenDistance / p.getZ());
+    }
+
     public void transformPointToCanvas(PointDraw point) {
         Point p = point.getPoint();
 
+        p.setX((int) (p.getX() + (screenWidth / 2)));
+        p.setY((int) (screenHeight / 2 - p.getY()));
+    }
+
+    public void transformPointToCanvas(Point p) {
         p.setX((int) (p.getX() + (screenWidth / 2)));
         p.setY((int) (screenHeight / 2 - p.getY()));
     }

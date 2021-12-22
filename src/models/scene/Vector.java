@@ -1,6 +1,7 @@
 package models.scene;
 
 import Jama.Matrix;
+import libs.SharedFunctions;
 
 public class Vector {
     private Matrix m = new Matrix(4, 1);
@@ -73,6 +74,21 @@ public class Vector {
         return this;
     }
 
+    public Vector plus(Vector v) {
+        return new Vector(
+                getX() + v.getX(),
+                getY() + v.getY(),
+                getZ() + v.getZ()
+        );
+    }
+
+    public Vector plusEquals(Vector v) {
+        setX(getX() + v.getX());
+        setY(getY() + v.getY());
+        setZ(getZ() + v.getZ());
+        return this;
+    }
+
     public Vector minus(Vector v) {
         return new Vector(
                 getX() - v.getX(),
@@ -85,6 +101,36 @@ public class Vector {
         setX(getX() - v.getX());
         setY(getY() - v.getY());
         setZ(getZ() - v.getZ());
+        return this;
+    }
+
+    public Vector times(double a) {
+        return new Vector(
+                getX() * a,
+                getY() * a,
+                getZ() * a
+        );
+    }
+
+    public Vector divideEquals(double a) {
+        setX(getX() / a);
+        setY(getY() / a);
+        setZ(getZ() / a);
+        return this;
+    }
+
+    public Vector invert() {
+        return new Vector(
+                -getX(),
+                -getY(),
+                -getZ()
+        );
+    }
+
+    public Vector invertEquals() {
+        setX(-getX());
+        setY(-getY());
+        setZ(-getZ());
         return this;
     }
 
@@ -117,5 +163,19 @@ public class Vector {
         public VectorWrapper(Vector v) {
             this.v = v;
         }
+    }
+
+    public double getAngle(Vector v) {
+        double a = scalarProduct(v);
+        double b = this.len() * v.len();
+        if (SharedFunctions.doubleCompare(b, 0) == 0) {
+            return 0;
+        }
+
+        return a / b;
+    }
+
+    public String toString() {
+        return String.format("Vector{x=%.6f, y=%.6f, z=%.6f}", getX(), getY(), getZ());
     }
 }

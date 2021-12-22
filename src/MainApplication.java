@@ -9,16 +9,13 @@ import repositories.SceneRepository;
 import repositories.DrawerZBuffer;
 import views.ButtonPanel;
 import views.MainMenuBar;
-import views.PolygonEditor;
+import views.editor.PolygonEditorView;
 import views.user_input.AddPointView;
 import views.CanvasView;
 import views.user_input.AddPolygonView;
-import views.user_input.PolygonEditorMenuBar;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,6 +56,14 @@ public class MainApplication extends JFrame {
         setButtonPanelCallbacks();
         setMenuCallbacks();
         setCanvasCallbacks();
+
+        // DBG
+        try {
+            changeSceneRepository(sceneController.readFromFile("D:/courseCG/scenes/cube.txt"));
+        }
+        catch (Exception e) {
+            System.out.println("no");
+        }
     }
 
     private void initGUI() {
@@ -164,8 +169,8 @@ public class MainApplication extends JFrame {
                 return;
             }
 
-            PolygonEditor frame = new PolygonEditor(polygon);
-            frame.setVisible(true);
+            PolygonEditorView frame = new PolygonEditorView(polygon);
+            frame.start();
         });
     }
 
