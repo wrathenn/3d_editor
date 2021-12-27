@@ -34,8 +34,7 @@ public class PolygonEditorView extends JFrame {
         setVisible(true);
         polygonEditor.countFinalPoly();
         polygonEditor.setCanvas(canvas);
-        polygonEditor.drawPoly();
-        canvas.setClickCallback(() -> polygonEditor.drawPoly());
+        canvas.setDrawCallback((g) -> polygonEditor.drawPoly(g));
     }
 
     private final int DEFAULT_WIDTH = 512;
@@ -45,8 +44,8 @@ public class PolygonEditorView extends JFrame {
 
     }
 
-    private interface ClickCallback {
-        void callback();
+    private interface drawCallback {
+        void callback(Graphics g);
     }
 
     private static class PolygonEditorCanvas extends JPanel implements MouseListener {
@@ -58,17 +57,20 @@ public class PolygonEditorView extends JFrame {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
+            if (drawCallback != null) {
+                drawCallback.callback(g);
+            }
         }
 
-        private ClickCallback clickCallback;
-        public void setClickCallback(ClickCallback cb) {
-            clickCallback = cb;
+        private drawCallback drawCallback;
+        public void setDrawCallback(drawCallback cb) {
+            drawCallback = cb;
         }
 
         @Override
         public void mouseClicked(MouseEvent e) {
             System.out.println("asd");
-            clickCallback.callback();
+            paintComponent(getGraphics());
         }
 
         @Override

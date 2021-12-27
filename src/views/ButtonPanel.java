@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ButtonPanel extends JPanel {
-    private JButton drawButton;
     private JButton addPointButton;
     private JButton addPolygonButton;
     private JButton editPolygon;
@@ -17,11 +16,6 @@ public class ButtonPanel extends JPanel {
     public ButtonPanel() {
         super();
         this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-        drawButton = new JButton("draw");
-        drawButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        drawButton.setBackground(Color.ORANGE);
-        this.add(drawButton);
 
         addPointButton = new JButton("Add point");
         addPointButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
@@ -39,10 +33,6 @@ public class ButtonPanel extends JPanel {
         this.add(editPolygon);
 
         this.setBackground(Color.black);
-    }
-
-    public void setDrawButtonCallback(RenderCallback callback) {
-        drawButton.addActionListener(e -> callback.render());
     }
 
     public void setAddPointButtonActionListener(ActionListener actionListener) {

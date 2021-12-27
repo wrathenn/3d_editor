@@ -46,11 +46,11 @@ public class MainApplication extends JFrame {
 
         canvas.setSceneRepository(sceneController.getSceneRepository());
 
-        canvas.renderCallback = () -> {
+        canvas.renderCallback = (g) -> {
             Camera camera = sceneController.getCamera();
             camera.setScreenHeight(canvas.getHeight());
             camera.setScreenWidth(canvas.getWidth());
-            drawController.draw(canvas.getGraphics(), sceneController.getCamera(), sceneController.getSceneRepository());
+            drawController.draw(g, sceneController.getCamera(), sceneController.getSceneRepository());
         };
 
         setButtonPanelCallbacks();
@@ -100,7 +100,6 @@ public class MainApplication extends JFrame {
                 drawController.setSelectedPolyId(null);
                 System.out.println("log - Unselected Poly");
             }
-            canvas.renderCallback.render();
         });
     }
 
@@ -120,7 +119,6 @@ public class MainApplication extends JFrame {
     }
 
     private void setButtonPanelCallbacks() {
-        buttonPanel.setDrawButtonCallback(canvas.renderCallback);
         buttonPanel.setAddPointButtonActionListener(e -> {
             AddPointView frame = new AddPointView();
             frame.setAddCallback(s -> {

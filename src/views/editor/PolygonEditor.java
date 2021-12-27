@@ -65,8 +65,7 @@ public class PolygonEditor {
         return (int) Math.round((double) h / 2 - y);
     }
 
-    public void drawPoly() {
-        Graphics graphics = canvas.getGraphics();
+    public void drawPoly(Graphics g) {
         int width = canvas.getWidth();
         int height = canvas.getHeight();
 
@@ -78,9 +77,7 @@ public class PolygonEditor {
             int x2 = toScreenX(end.getX(), width);
             int y2 = toScreenY(end.getY(), height);
 
-            graphics.drawLine(x1, y1, x2, y2);
+            g.drawLine(x1, y1, x2, y2);
         }
-
-        canvas.paintComponents(graphics);
     }
 }

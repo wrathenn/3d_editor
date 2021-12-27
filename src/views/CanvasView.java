@@ -29,6 +29,16 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         setKeyBinds();
     }
 
+    public void redraw() {
+        paintComponent(getGraphics());
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        renderCallback.render(g);
+//        super.paintComponent(g);
+    }
+
     // ----- Геттеры и Сеттеры ----- //
 
     public void setSceneRepository(SceneRepository sceneRepository) {
@@ -51,46 +61,48 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), "Q");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "E");
 
+        Graphics g = getGraphics();
+
         actionMap.put("W", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sceneRepository.getCamera().moveZ(keyboardSensitivity);
-                renderCallback.render();
+                renderCallback.render(g);
             }
         });
         actionMap.put("S", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sceneRepository.getCamera().moveZ(-keyboardSensitivity);
-                renderCallback.render();
+                renderCallback.render(g);
             }
         });
         actionMap.put("D", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sceneRepository.getCamera().moveX(keyboardSensitivity);
-                renderCallback.render();
+                renderCallback.render(g);
             }
         });
         actionMap.put("A", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sceneRepository.getCamera().moveX(-keyboardSensitivity);
-                renderCallback.render();
+                renderCallback.render(g);
             }
         });
         actionMap.put("Q", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sceneRepository.getCamera().moveY(keyboardSensitivity);
-                renderCallback.render();
+                renderCallback.render(g);
             }
         });
         actionMap.put("E", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sceneRepository.getCamera().moveY(-keyboardSensitivity);
-                renderCallback.render();
+                renderCallback.render(g);
             }
         });
     }
@@ -98,6 +110,7 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
     @Override
     public void mouseClicked(MouseEvent e) {
         selectPolyCallback.callback(e.getX(), e.getY());
+        paintComponent(getGraphics());
     }
 
     private int oldX = 0;
@@ -115,7 +128,8 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         oldX = curX;
         oldY = curY;
 
-        renderCallback.render();
+//        renderCallback.render(getGraphics());
+        paintComponent(getGraphics());
     }
 
     @Override
@@ -151,6 +165,6 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         int distance = e.getScrollAmount() * e.getWheelRotation();
         cam.setScreenDistance(cam.getScreenDistance() + distance);
         System.out.println(distance);
-        renderCallback.render();
+        renderCallback.render(getGraphics());
     }
 }

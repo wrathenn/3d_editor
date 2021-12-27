@@ -1,5 +1,7 @@
 package views.callbacks;
 
+import java.awt.*;
+
 public interface RenderCallback {
-    public void render();
+    void render(Graphics g);
 }
