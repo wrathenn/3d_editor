@@ -9,6 +9,7 @@ import repositories.SceneRepository;
 import repositories.DrawerZBuffer;
 import views.ButtonPanel;
 import views.MainMenuBar;
+import views.callbacks.CameraMoveCallback;
 import views.editor.PolygonEditorView;
 import views.user_input.AddPointView;
 import views.CanvasView;
@@ -41,17 +42,7 @@ public class MainApplication extends JFrame {
         initGUI();
 
         sceneController = new SceneController(new SceneRepository());
-
         drawController = new DrawController(new DrawerZBuffer(canvas.getSize()));
-
-        canvas.setSceneRepository(sceneController.getSceneRepository());
-
-        canvas.renderCallback = (g) -> {
-            Camera camera = sceneController.getCamera();
-            camera.setScreenHeight(canvas.getHeight());
-            camera.setScreenWidth(canvas.getWidth());
-            drawController.draw(g, sceneController.getCamera(), sceneController.getSceneRepository());
-        };
 
         setButtonPanelCallbacks();
         setMenuCallbacks();
@@ -59,10 +50,9 @@ public class MainApplication extends JFrame {
 
         // DBG
         try {
-            changeSceneRepository(sceneController.readFromFile("D:/courseCG/scenes/cube.txt"));
-        }
-        catch (Exception e) {
-            System.out.println("no");
+            changeSceneRepository(sceneController.readFromFile("D:/IdeaProjects/courseCG/scenes/cube.txt"));
+        } catch (Exception e) {
+            System.out.println("dbg no");
         }
     }
 
@@ -87,10 +77,16 @@ public class MainApplication extends JFrame {
 
     private void changeSceneRepository(SceneRepository newRepo) {
         sceneController.setSceneRepository(newRepo);
-        canvas.setSceneRepository(newRepo);
     }
 
     private void setCanvasCallbacks() {
+        canvas.renderCallback = (Graphics g) -> {
+            Camera camera = sceneController.getCamera();
+            camera.setScreenHeight(canvas.getHeight());
+            camera.setScreenWidth(canvas.getWidth());
+            drawController.draw(g, sceneController.getCamera(), sceneController.getSceneRepository());
+        };
+
         canvas.setSelectPolyCallback((x, y) -> {
             UUID id = drawController.getPolyId(x, y);
             if (id != null) {
@@ -99,6 +95,36 @@ public class MainApplication extends JFrame {
             } else {
                 drawController.setSelectedPolyId(null);
                 System.out.println("log - Unselected Poly");
+            }
+        });
+
+        canvas.setCameraMoveCallback(new CameraMoveCallback() {
+            @Override
+            public void moveX(double sens) {
+                sceneController.getCamera().moveX(sens);
+            }
+
+            @Override
+            public void moveY(double sens) {
+                sceneController.getCamera().moveY(sens);
+            }
+
+            @Override
+            public void moveZ(double sens) {
+                sceneController.getCamera().moveZ(sens);
+            }
+
+            @Override
+            public void rotateXY(double x, double y) {
+                Camera c = sceneController.getCamera();
+                c.rotateX(x);
+                c.rotateY(y);
+            }
+
+            @Override
+            public void moveScreen(double dist) {
+                Camera c = sceneController.getCamera();
+                c.setScreenDistance(c.getScreenDistance() + dist);
             }
         });
     }

@@ -7,6 +7,7 @@ import models.draw.PolygonDraw;
 import models.scene.Edge;
 import models.scene.Point;
 import models.scene.Polygon;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import repositories.DrawerZBuffer;
 import repositories.SceneRepository;
@@ -30,10 +31,6 @@ public class DrawController {
 
     // ----- Сеттеры и Геттеры ----- //
 
-    public void setDrawer(DrawerZBuffer drawer) {
-        this.drawer = drawer;
-    }
-
     public void setCanvas(Graphics canvas) {
         this.drawer.setCanvas(canvas);
     }
@@ -53,6 +50,9 @@ public class DrawController {
     // ----- Нормальные методы ----- //
 
     public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
+        if (canvas == null) {
+            return;
+        }
         drawer.setSize(camera.getScreenWidth(), camera.getScreenHeight());
         drawer.clearBuffer();
 

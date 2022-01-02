@@ -2,6 +2,7 @@ package views;
 
 import models.draw.Camera;
 import repositories.SceneRepository;
+import views.callbacks.CameraMoveCallback;
 import views.callbacks.SelectPolyCallback;
 import views.callbacks.RenderCallback;
 
@@ -11,10 +12,9 @@ import java.awt.event.*;
 import java.util.UUID;
 
 public class CanvasView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
-    public SceneRepository sceneRepository;
-
     public RenderCallback renderCallback;
     private SelectPolyCallback selectPolyCallback;
+    private CameraMoveCallback cameraMoveCallback;
 
     private double rotateSensitivity = 0.25f;
     private double keyboardSensitivity = 2;
@@ -29,25 +29,20 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         setKeyBinds();
     }
 
-    public void redraw() {
-        paintComponent(getGraphics());
-    }
-
     @Override
     public void paintComponent(Graphics g) {
         renderCallback.render(g);
-//        super.paintComponent(g);
     }
 
     // ----- Геттеры и Сеттеры ----- //
-
-    public void setSceneRepository(SceneRepository sceneRepository) {
-        this.sceneRepository = sceneRepository;
-    }
-
     public void setSelectPolyCallback(SelectPolyCallback selectPolyCallback) {
         this.selectPolyCallback = selectPolyCallback;
     }
+
+    public void setCameraMoveCallback(CameraMoveCallback cameraMoveCallback) {
+        this.cameraMoveCallback = cameraMoveCallback;
+    }
+
     // ----- Настройки ----- //
 
     private void setKeyBinds() {
@@ -61,48 +56,46 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), "Q");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "E");
 
-        Graphics g = getGraphics();
-
         actionMap.put("W", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sceneRepository.getCamera().moveZ(keyboardSensitivity);
-                renderCallback.render(g);
+                cameraMoveCallback.moveZ(keyboardSensitivity);
+                paintComponent(getGraphics());
             }
         });
         actionMap.put("S", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sceneRepository.getCamera().moveZ(-keyboardSensitivity);
-                renderCallback.render(g);
+                cameraMoveCallback.moveZ(-keyboardSensitivity);
+                paintComponent(getGraphics());
             }
         });
         actionMap.put("D", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sceneRepository.getCamera().moveX(keyboardSensitivity);
-                renderCallback.render(g);
+                cameraMoveCallback.moveX(keyboardSensitivity);
+                paintComponent(getGraphics());
             }
         });
         actionMap.put("A", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sceneRepository.getCamera().moveX(-keyboardSensitivity);
-                renderCallback.render(g);
+                cameraMoveCallback.moveX(-keyboardSensitivity);
+                paintComponent(getGraphics());
             }
         });
         actionMap.put("Q", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sceneRepository.getCamera().moveY(keyboardSensitivity);
-                renderCallback.render(g);
+                cameraMoveCallback.moveY(keyboardSensitivity);
+                paintComponent(getGraphics());
             }
         });
         actionMap.put("E", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sceneRepository.getCamera().moveY(-keyboardSensitivity);
-                renderCallback.render(g);
+                cameraMoveCallback.moveY(-keyboardSensitivity);
+                paintComponent(getGraphics());
             }
         });
     }
@@ -121,20 +114,16 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
         int curX = e.getX();
         int curY = e.getY();
 
-        Camera camera = sceneRepository.getCamera();
-        camera.rotateX((curX - oldX) * rotateSensitivity);
-        camera.rotateY((curY - oldY) * rotateSensitivity);
+        cameraMoveCallback.rotateXY((curX - oldX) * rotateSensitivity, (curY - oldY) * rotateSensitivity);
 
         oldX = curX;
         oldY = curY;
 
-//        renderCallback.render(getGraphics());
         paintComponent(getGraphics());
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-//        System.out.println("asd2");
     }
 
     @Override
@@ -161,10 +150,12 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        Camera cam = sceneRepository.getCamera();
-        int distance = e.getScrollAmount() * e.getWheelRotation();
-        cam.setScreenDistance(cam.getScreenDistance() + distance);
-        System.out.println(distance);
-        renderCallback.render(getGraphics());
+        double distance = e.getScrollAmount() * e.getWheelRotation();
+        if (distance == 0) {
+            return;
+        }
+
+        cameraMoveCallback.moveScreen(distance);
+        paintComponent(getGraphics());
     }
 }
