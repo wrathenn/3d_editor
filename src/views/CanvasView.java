@@ -1,20 +1,21 @@
 package views;
 
-import models.draw.Camera;
-import repositories.SceneRepository;
 import views.callbacks.CameraMoveCallback;
-import views.callbacks.SelectPolyCallback;
+import views.callbacks.MovePointsCallback;
+import views.callbacks.SelectCallback;
 import views.callbacks.RenderCallback;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.UUID;
 
 public class CanvasView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
     public RenderCallback renderCallback;
-    private SelectPolyCallback selectPolyCallback;
+    private SelectCallback selectCallback;
+    private SelectCallback unselectPointsCallback;
     private CameraMoveCallback cameraMoveCallback;
+
+    private MovePointsCallback movePointsCallback;
 
     private double rotateSensitivity = 0.25f;
     private double keyboardSensitivity = 2;
@@ -35,12 +36,20 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
     }
 
     // ----- Геттеры и Сеттеры ----- //
-    public void setSelectPolyCallback(SelectPolyCallback selectPolyCallback) {
-        this.selectPolyCallback = selectPolyCallback;
+    public void setSelectCallback(SelectCallback selectCallback) {
+        this.selectCallback = selectCallback;
+    }
+
+    public void setUnselectPointsCallback(SelectCallback unselectPointsCallback) {
+        this.unselectPointsCallback = unselectPointsCallback;
     }
 
     public void setCameraMoveCallback(CameraMoveCallback cameraMoveCallback) {
         this.cameraMoveCallback = cameraMoveCallback;
+    }
+
+    public void setMovePointsCallback(MovePointsCallback movePointsCallback) {
+        this.movePointsCallback = movePointsCallback;
     }
 
     // ----- Настройки ----- //
@@ -102,23 +111,36 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        selectPolyCallback.callback(e.getX(), e.getY());
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            selectCallback.callback(e.getX(), e.getY());
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
+            unselectPointsCallback.callback(e.getX(), e.getY());
+        }
         paintComponent(getGraphics());
     }
 
     private int oldX = 0;
     private int oldY = 0;
+    private final double movePointSensitivity = 3;
 
     @Override
     public void mouseDragged(MouseEvent e) {
         int curX = e.getX();
         int curY = e.getY();
 
-        cameraMoveCallback.rotateXY((curX - oldX) * rotateSensitivity, (curY - oldY) * rotateSensitivity);
+        if (e.isShiftDown() || e.isAltDown() || e.isControlDown()) {
+            int dMouse = curX - oldX;
+            double dx = (e.isShiftDown() ? 1 : 0) * movePointSensitivity * dMouse;
+            double dy = (e.isAltDown() ? 1 : 0) * movePointSensitivity * dMouse;
+            double dz = (e.isControlDown() ? 1 : 0) * movePointSensitivity * dMouse;
+            movePointsCallback.callback(dx, dy, dz);
+        }
+        else {
+            cameraMoveCallback.rotateXY((curX - oldX) * rotateSensitivity, (curY - oldY) * rotateSensitivity);
+        }
 
         oldX = curX;
         oldY = curY;
-
         paintComponent(getGraphics());
     }
 

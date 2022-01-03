@@ -21,7 +21,7 @@ public class Intensity {
         blueI = i.blueI;
     }
 
-    public Intensity add(Intensity i) {
+    public Intensity addEquals(Intensity i) {
         redI += i.redI;
         greenI += i.greenI;
         blueI += i.blueI;
@@ -29,20 +29,28 @@ public class Intensity {
     }
 
     public Intensity minus(Intensity i) {
+        return new Intensity(
+                redI - i.redI,
+                greenI - i.greenI,
+                blueI - i.blueI
+        );
+    }
+
+    public Intensity minusEquals(Intensity i) {
         redI -= i.redI;
         greenI -= i.greenI;
         blueI -= i.blueI;
         return this;
     }
 
-    public Intensity divide(double n) {
+    public Intensity divideEquals(double n) {
         redI /= n;
         greenI /= n;
         blueI /= n;
         return this;
     }
 
-    public static Intensity multiply(Intensity i, double n) {
+    public static Intensity multiplyEquals(Intensity i, double n) {
         return new Intensity(
                 Math.abs(i.redI * n),
                 Math.abs(i.greenI * n),

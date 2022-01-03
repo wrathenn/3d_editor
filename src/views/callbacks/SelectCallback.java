@@ -1,5 +1,5 @@
 package views.callbacks;
 
-public interface SelectPolyCallback {
+public interface SelectCallback {
     void callback(int x, int y);
 }

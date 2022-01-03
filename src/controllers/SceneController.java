@@ -13,6 +13,7 @@ import repositories.SceneRepository;
 
 import java.awt.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class SceneController {
@@ -113,5 +114,13 @@ public class SceneController {
         newRepo.setCamera(newCamera);
 
         return newRepo;
+    }
+
+    public void movePoints(ArrayList<String> nameIds, double x, double y, double z) {
+        sceneRepository.movePoints(nameIds, x, y, z);
+    }
+
+    public void movePoly(UUID polyId, double x, double y, double z) {
+        sceneRepository.movePoly(polyId, x, y, z);
     }
 }

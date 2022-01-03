@@ -12,10 +12,11 @@ import java.util.List;
 
 public class DrawerZBuffer {
     protected Graphics canvas;
-    protected Camera camera;
+    public Camera camera;
 
     private double[][] zBuffer;
     private UUID[][] polyReferences;
+    private String[][] pointReferences;
 
     private final Intensity diffusionI = new Intensity(0.5, 0.5, 0.5);
     private final Intensity backGroundI = new Intensity(0.35, 0.35, 0.35);
@@ -49,6 +50,7 @@ public class DrawerZBuffer {
         if (this.width < width || this.height < height) {
             zBuffer = new double[width][height];
             polyReferences = new UUID[width][height];
+            pointReferences = new String[width][height];
         }
         this.width = width;
         this.height = height;
@@ -90,7 +92,7 @@ public class DrawerZBuffer {
                 int xt = (int) x;
                 int y = (int) valuesY[i];
                 double z = valuesZ[i];
-                drawPixelCheck(xt, y, z, c);
+                drawPixel(xt, y, z, c);
             }
         } else {
             if (p1.getY() > p2.getY()) {
@@ -106,56 +108,46 @@ public class DrawerZBuffer {
                 int yt = (int) y;
                 int x = (int) valuesY[i];
                 double z = valuesZ[i];
-                drawPixelCheck(x, yt, z, c);
+                drawPixel(x, yt, z, c);
             }
         }
     }
 
-    private void drawPixelCheck(int x, int y, double z, Color c, UUID polyId) {
-        if (x >= width || x < 0 || y >= height || y < 0) {
-            return;
-        }
-        drawPixel(x, y, z, c, polyId);
+    private boolean checkBoundaries(int x, int y) {
+        return x >= width || x < 0 || y >= height || y < 0;
     }
 
-    private void drawPixelCheck(int x, int y, double z, Color c) {
-        if (x >= width || x < 0 || y >= height || y < 0) {
-            return;
-        }
-        drawPixel(x, y, z, c);
+    private boolean checkBuffer(int x, int y, double z) {
+        return zBuffer[x][y] <= z;
     }
 
-    private void drawPixelCheckX(int x, int y, double z, Color c, UUID polyId) {
-        if (x >= width || x < 0) {
-            return;
-        }
-        drawPixel(x, y, z, c, polyId);
-    }
-
-    private void drawPixelCheckX(int x, int y, double z, Color c) {
-        if (x >= width || x < 0) {
-            return;
-        }
-        drawPixel(x, y, z, c);
-    }
-
-    private void drawPixel(int x, int y, double z, Color c, UUID polyId) {
-        if (zBuffer[x][y] > z) {
-            zBuffer[x][y] = z;
-            polyReferences[x][y] = polyId;
-
-            canvas.setColor(c);
-            canvas.drawLine(x, y, x, y);
-        }
+    private void _drawPixel(int x, int y, double z, Color c) {
+        zBuffer[x][y] = z;
+        canvas.setColor(c);
+        canvas.drawLine(x, y, x, y);
     }
 
     private void drawPixel(int x, int y, double z, Color c) {
-        if (zBuffer[x][y] > z) {
-            zBuffer[x][y] = z;
-
-            canvas.setColor(c);
-            canvas.drawLine(x, y, x, y);
+        if (checkBoundaries(x, y) || checkBuffer(x, y, z)) {
+            return;
         }
+        _drawPixel(x, y, z, c);
+    }
+
+    private void drawPixel(int x, int y, double z, Color c, String pointId) {
+        if (checkBoundaries(x, y) || checkBuffer(x, y, z)) {
+            return;
+        }
+        _drawPixel(x, y, z, c);
+        pointReferences[x][y] = pointId;
+    }
+
+    private void drawPixel(int x, int y, double z, Color c, UUID polyId) {
+        if (checkBoundaries(x, y) || checkBuffer(x, y, z)) {
+            return;
+        }
+        _drawPixel(x, y, z, c);
+        polyReferences[x][y] = polyId;
     }
 
     public Color setColor(Color c) {
@@ -172,6 +164,7 @@ public class DrawerZBuffer {
         for (int i = 0; i < width; i++) {
             for (int k = 0; k < height; k++) {
                 zBuffer[i][k] = Integer.MAX_VALUE;
+                pointReferences[i][k] = null;
                 polyReferences[i][k] = null;
             }
         }
@@ -181,25 +174,19 @@ public class DrawerZBuffer {
         return polyReferences[x][y];
     }
 
+    public String getPointName(int x, int y) {
+        return pointReferences[x][y];
+    }
+
     // ----- Работа с точкой
-
-    public void transformPointToCameraCoordinates(PointDraw point) {
-        Point p = point.getPoint();
-        p.timesRightEquals(camera.lookAt);
-    }
-
-    public void findViewerVector(PointDraw point) {
-        Vector viewerVector = camera.findViewerVector(point);
-        point.setViewerVector(viewerVector);
-    }
 
     public void findPointColor(PointDraw point, Vector polyNormal) {
         // Почленное умножение нормали точки на вектор к наблюдателю
         double diffusionLN = Point.scalarProduct(point.getViewerVector(), polyNormal);
         // Нахождение диффузной составляющей интенсивности
-        Intensity intensity = Intensity.multiply(diffusionI, diffusionLN);
+        Intensity intensity = Intensity.multiplyEquals(diffusionI, diffusionLN);
         // Прибавить фоновую составляющую
-        intensity.add(backGroundI);
+        intensity.addEquals(backGroundI);
 
         point.setIntensity(intensity);
     }
@@ -245,7 +232,7 @@ public class DrawerZBuffer {
 
     private void renderSortEdges(List<EdgeDraw> edges, SortedLinkedList<EdgeDrawInfo> infoList) {
         for (EdgeDraw e : edges) {
-            EdgeDrawInfo newInfo = new EdgeDrawInfo(e, camera);
+            EdgeDrawInfo newInfo = new EdgeDrawInfo(e);
             infoList.add(newInfo);
         }
     }
@@ -264,20 +251,20 @@ public class DrawerZBuffer {
                 xzEnd = xzList.pop();
             }
 
-            double dz = (xzEnd.z - xzBegin.z) / (xzEnd.x - xzBegin.x);
-            Intensity dI = xzEnd.intensity.minus(xzBegin.intensity).divide(xzEnd.x - xzBegin.x);
-
             int xb = (int) Math.round(xzBegin.x);
             int xe = (int) Math.round(xzEnd.x);
+
+            double dz = (xzEnd.z - xzBegin.z) / (xzEnd.x - xzBegin.x);
+            Intensity dI = xzEnd.intensity.minus(xzBegin.intensity).divideEquals(xe - xb);
 
             while (xb < xe) {
                 Color c1 = xzBegin.intensity.applyColor(polyColor);
 
-                drawPixelCheckX(xb, currentY, xzBegin.z, c1, polyId);
+                drawPixel(xb, currentY, xzBegin.z, c1, polyId);
 
                 xb++;
                 xzBegin.z += dz;
-                xzBegin.intensity.add(dI);
+                xzBegin.intensity.addEquals(dI);
             }
         }
     }
@@ -290,22 +277,46 @@ public class DrawerZBuffer {
 
             edgeInfo.yBegin--;
             edgeInfo.lenY--;
-            edgeInfo.currentI.add(edgeInfo.dI);
+            edgeInfo.currentI.addEquals(edgeInfo.dI);
 
-            if (SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == 0 || SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == -1) {
+            if (SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == 0 ||
+                    SharedFunctions.doubleCompare(edgeInfo.lenY, 0f) == -1) {
                 activeList.remove(i);
                 i--;
             }
         }
     }
 
+    public void transformPointOnCamera(PointDraw p) {
+        camera.pointToCameraCoordinates(p);
+        camera.pointViewerVector(p);
+        camera.pointToCameraScreen(p);
+        camera.pointToCanvas(p);
+    }
+
     // ----- Для интерфейса
 
-    public void drawPointName(PointDraw point) {
-        PointDraw newP = new PointDraw(point);
-        camera.transformPointToCameraScreen(newP);
-        camera.transformPointToCanvas(newP);
+    public void drawPoint(PointDraw point, boolean isSelected) {
+        int x = (int) point.getX();
+        int y = (int) point.getY();
+        double z = point.getZ();
 
-        canvas.drawString(point.getNameID(), (int) Math.round(newP.getX()), (int) Math.round(newP.getY()));
+        if (checkBoundaries(x - 4, y - 4) || checkBoundaries(x + 4, y + 4)) {
+            return;
+        }
+
+        if (SharedFunctions.doubleCompare(zBuffer[x][y], z) >= 0) {
+            String nameId = point.getNameID();
+
+            canvas.setColor(isSelected ? Color.blue : Color.black);
+            canvas.fillRect(x - 3, y - 3, 7, 7);
+            canvas.drawString(nameId, x - 7, y - 7);
+
+            for (int i = -2; i < 3; i++) {
+                for (int k = -2; k < 5; k++) {
+                    pointReferences[x - i][y - k] = nameId;
+                }
+            }
+        }
     }
 }

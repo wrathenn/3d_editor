@@ -50,7 +50,7 @@ public class MainApplication extends JFrame {
 
         // DBG
         try {
-            changeSceneRepository(sceneController.readFromFile("D:/IdeaProjects/courseCG/scenes/cube.txt"));
+            changeSceneRepository(sceneController.readFromFile("D:/courseCG/scenes/cube.txt"));
         } catch (Exception e) {
             System.out.println("dbg no");
         }
@@ -87,16 +87,22 @@ public class MainApplication extends JFrame {
             drawController.draw(g, sceneController.getCamera(), sceneController.getSceneRepository());
         };
 
-        canvas.setSelectPolyCallback((x, y) -> {
-            UUID id = drawController.getPolyId(x, y);
+        canvas.setSelectCallback((x, y) -> {
+            String id = drawController.getPointName(x, y);
             if (id != null) {
-                drawController.setSelectedPolyId(id);
-                System.out.println("log - Selected new Poly with ID=" + id);
-            } else {
-                drawController.setSelectedPolyId(null);
-                System.out.println("log - Unselected Poly");
+                drawController.addSelectedPointName(id);
+                System.out.println("log - Selected new Point with Name=" + id);
+                return;
+            }
+
+            UUID polyId = drawController.getPolyId(x, y);
+            if (polyId != null) {
+                drawController.setSelectedPolyId(polyId);
+                System.out.println("log - Selected new Polygon with Name=" + polyId);
             }
         });
+
+        canvas.setUnselectPointsCallback((x, y) -> drawController.clearSelected());
 
         canvas.setCameraMoveCallback(new CameraMoveCallback() {
             @Override
@@ -125,6 +131,19 @@ public class MainApplication extends JFrame {
             public void moveScreen(double dist) {
                 Camera c = sceneController.getCamera();
                 c.setScreenDistance(c.getScreenDistance() + dist);
+            }
+        });
+
+        canvas.setMovePointsCallback((x, y, z) -> {
+            ArrayList<String> selected = drawController.getSelectedPointNames();
+            if (selected.size() != 0) {
+                sceneController.movePoints(selected, x, y, z);
+                return;
+            }
+
+            UUID selectedPoly = drawController.getSelectedPolyId();
+            if (selectedPoly != null) {
+                sceneController.movePoly(selectedPoly, x, y, z);
             }
         });
     }

@@ -104,33 +104,28 @@ public class Camera {
         }
     }
 
-    public Vector findViewerVector(PointDraw point) {
-        Vector viewVector = new Vector(point.getVector()).normalizeEquals();
-        return viewVector;
+    public void pointViewerVector(PointDraw p) {
+        p.setViewerVector(new Vector(
+                p.getVector()
+        ).normalizeEquals());
     }
 
-    public void transformPointToCameraScreen(PointDraw point) {
+    public void pointToCameraCoordinates(PointDraw p) {
+        p.getPoint().timesRightEquals(lookAt);
+    }
+
+    public void pointToCameraScreen(PointDraw point) {
         Point p = point.getPoint();
 
         p.setY(p.getY() * screenDistance / p.getZ());
         p.setX(p.getX() * screenDistance / p.getZ());
     }
 
-    public void transformPointToCameraScreen(Point p) {
-        p.setY(p.getY() * screenDistance / p.getZ());
-        p.setX(p.getX() * screenDistance / p.getZ());
-    }
-
-    public void transformPointToCanvas(PointDraw point) {
+    public void pointToCanvas(PointDraw point) {
         Point p = point.getPoint();
 
-        p.setX((int) (p.getX() + (screenWidth / 2)));
-        p.setY((int) (screenHeight / 2 - p.getY()));
-    }
-
-    public void transformPointToCanvas(Point p) {
-        p.setX((int) (p.getX() + (screenWidth / 2)));
-        p.setY((int) (screenHeight / 2 - p.getY()));
+        p.setX(Math.round(p.getX() + (double) screenWidth / 2));
+        p.setY(Math.round((double) screenHeight / 2 - p.getY()));
     }
 
     // ----- Геттеры и Сеттеры ----- //

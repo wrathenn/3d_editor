@@ -7,6 +7,7 @@ import models.scene.Point;
 import models.scene.Edge;
 import models.scene.Polygon;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class SceneRepository {
@@ -77,5 +78,31 @@ public class SceneRepository {
 
     public void delete(Polygon p) {
         System.out.println("Удаление полигона " + p.toString());
+    }
+
+    public void movePoints(ArrayList<String> nameIds, double x, double y, double z) {
+        for (String nameId : nameIds) {
+            Point p = points.get(nameId);
+            if (p == null) {
+                continue;
+            }
+
+            p.setX(p.getX() + x);
+            p.setY(p.getY() + y);
+            p.setZ(p.getZ() + z);
+        }
+    }
+
+    public void movePoly(UUID polyId, double x, double y, double z) {
+        Polygon poly = polygons.get(polyId);
+        if (poly == null) {
+            return;
+        }
+
+        for (Point p : poly.getPoints()) {
+            p.setX(p.getX() + x);
+            p.setY(p.getY() + y);
+            p.setZ(p.getZ() + z);
+        }
     }
 }

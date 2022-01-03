@@ -10,13 +10,9 @@ public class EdgeDrawInfo {
     public double dx;
     public double dz;
 
-    public EdgeDrawInfo(EdgeDraw edge, Camera camera) {
+    public EdgeDrawInfo(EdgeDraw edge) {
         PointDraw pBegin = new PointDraw(edge.getBegin());
         PointDraw pEnd = new PointDraw(edge.getEnd());
-        camera.transformPointToCameraScreen(pBegin);
-        camera.transformPointToCanvas(pBegin);
-        camera.transformPointToCameraScreen(pEnd);
-        camera.transformPointToCanvas(pEnd);
 
         if (pBegin.getY() < pEnd.getY()) {
             PointDraw temp = pBegin;
@@ -29,7 +25,7 @@ public class EdgeDrawInfo {
         yBegin = pBegin.getY();
         z = pBegin.getZ();
         currentI = new Intensity(pBegin.getIntensity());
-        dI = new Intensity(pEnd.getIntensity()).minus(currentI).divide(lenY);
+        dI = new Intensity(pEnd.getIntensity()).minusEquals(currentI).divideEquals(lenY);
         dx = lenY != 0 ? (pEnd.getX() - pBegin.getX()) / lenY : 0;
         dz = lenY != 0 ? (pEnd.getZ() - pBegin.getZ()) / lenY : 0;
     }
