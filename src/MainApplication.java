@@ -161,6 +161,14 @@ public class MainApplication extends JFrame {
                 }
             }
         });
+
+        menu.setSaveActionListener(e -> {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+
+                }
+        });
     }
 
     private void setButtonPanelCallbacks() {

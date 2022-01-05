@@ -116,6 +116,10 @@ public class SceneController {
         return newRepo;
     }
 
+    public void saveToFile(String filename) {
+
+    }
+
     public void movePoints(ArrayList<String> nameIds, double x, double y, double z) {
         sceneRepository.movePoints(nameIds, x, y, z);
     }

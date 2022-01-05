@@ -31,4 +31,8 @@ public class MainMenuBar extends JMenuBar {
     public void setOpenActionListener(ActionListener e) {
         open.addActionListener(e);
     }
+
+    public void setSaveActionListener(ActionListener e) {
+        save.addActionListener(e);
+    }
 }
