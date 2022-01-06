@@ -296,7 +296,26 @@ public class DrawerZBuffer {
 
     // ----- Для интерфейса
 
-    public void drawPoint(PointDraw point, boolean isSelected) {
+    private void drawPointName(PointDraw p, int pointNameMode) {
+        switch (pointNameMode) {
+            case 1:
+                canvas.drawString(p.getNameID(), (int) p.getX() - 7, (int) p.getY() - 7);
+                break;
+            case 2:
+                canvas.drawString(String.format("%s(%.3f, %.3f, %.3f)",
+                                p.getNameID(),
+                                p.getX(),
+                                p.getY(),
+                                p.getZ()
+                        ),
+                        (int) p.getX() - 7, (int) p.getY() - 7);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void drawPoint(PointDraw point, boolean isSelected, int pointNameMode) {
         int x = (int) point.getX();
         int y = (int) point.getY();
         double z = point.getZ();
@@ -310,7 +329,7 @@ public class DrawerZBuffer {
 
             canvas.setColor(isSelected ? Color.blue : Color.black);
             canvas.fillRect(x - 3, y - 3, 7, 7);
-            canvas.drawString(nameId, x - 7, y - 7);
+            drawPointName(point, pointNameMode);
 
             for (int i = -2; i < 3; i++) {
                 for (int k = -2; k < 5; k++) {

@@ -1,5 +1,6 @@
 package views;
 
+import io.GlobalLogger;
 import views.callbacks.CameraMoveCallback;
 import views.callbacks.MovePointsCallback;
 import views.callbacks.SelectCallback;
@@ -8,6 +9,7 @@ import views.callbacks.RenderCallback;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Level;
 
 public class CanvasView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
     public RenderCallback renderCallback;
@@ -33,6 +35,10 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
     @Override
     public void paintComponent(Graphics g) {
         renderCallback.render(g);
+    }
+
+    public void _repaint() {
+        paintComponent(getGraphics());
     }
 
     // ----- Геттеры и Сеттеры ----- //
@@ -134,8 +140,7 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
             double dy = (e.isAltDown() ? 1 : 0) * movePointSensitivity * dMouse;
             double dz = (e.isControlDown() ? 1 : 0) * movePointSensitivity * dMouse;
             movePointsCallback.callback(dx, dy, dz);
-        }
-        else {
+        } else {
             cameraMoveCallback.rotateXY((curX - oldX) * rotateSensitivity, (curY - oldY) * rotateSensitivity);
         }
 
@@ -152,22 +157,22 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
     public void mousePressed(MouseEvent e) {
         oldX = e.getX();
         oldY = e.getY();
-        System.out.println("pressed - " + e.getX() + ", " + e.getY());
+//        GlobalLogger.getLogger().log(Level.INFO, "pressed - " + e.getX() + ", " + e.getY());
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        System.out.println("released - " + e.getX() + ", " + e.getY());
+//        GlobalLogger.getLogger().log(Level.INFO, "released - " + e.getX() + ", " + e.getY());
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        System.out.println("entered");
+//        GlobalLogger.getLogger().log(Level.INFO, "mouse cursor entered canvas");
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        System.out.println("exited - " + getSize().width + ", " + getSize().height);
+//        GlobalLogger.getLogger().log(Level.INFO, "mouse cursor exited canvas - ");
     }
 
     @Override

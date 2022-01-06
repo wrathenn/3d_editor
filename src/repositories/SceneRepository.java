@@ -1,6 +1,7 @@
 package repositories;
 
 import exceptions.ExistedNameException;
+import io.GlobalLogger;
 import libs.HashMapUnique;
 import models.draw.Camera;
 import models.scene.Point;
@@ -9,6 +10,7 @@ import models.scene.Polygon;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class SceneRepository {
     private HashMapUnique<String, Point> points;
@@ -42,17 +44,12 @@ public class SceneRepository {
     // ----- Методы ----- //
 
     public void add(Point p) throws ExistedNameException {
-        if (points.containsKey(p.getNameID())) {
-            throw new ExistedNameException(String.format(
-                    "Ошибка. Уже существует Point с именем %s.", p.getNameID()
-            ));
-        }
-        System.out.printf("log - добавление точки %s.%n", p);
+        GlobalLogger.getLogger().log(Level.INFO, "adding point " + p);
         points.put(p.getNameID(), p);
     }
 
     public void add(Polygon p) {
-        System.out.printf("log - добавление полигона %s.%n", p);
+        GlobalLogger.getLogger().log(Level.INFO, "adding polygon " + p);
         polygons.put(UUID.randomUUID(), p);
     }
 
@@ -69,15 +66,15 @@ public class SceneRepository {
     }
 
     public void delete(Point p) {
-        System.out.println("Удаление точки " + p.toString());
+        GlobalLogger.getLogger().log(Level.INFO, "delete point " + p.toString());
     }
 
     public void delete(Edge e) {
-        System.out.println("Удаление ребра " + e.toString());
+        GlobalLogger.getLogger().log(Level.INFO, "delete edge " + e.toString());
     }
 
     public void delete(Polygon p) {
-        System.out.println("Удаление полигона " + p.toString());
+        GlobalLogger.getLogger().log(Level.INFO, "delete polygon " + p.toString());
     }
 
     public void movePoints(ArrayList<String> nameIds, double x, double y, double z) {

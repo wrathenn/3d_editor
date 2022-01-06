@@ -1,59 +1,54 @@
 import controllers.DrawController;
 import controllers.SceneController;
-import exceptions.ExistedNameException;
-import exceptions.NotExistedNameException;
+import groovy.lang.GroovyClassLoader;
+import io.GlobalLogger;
 import models.draw.Camera;
-import models.scene.Point;
 import models.scene.Polygon;
 import repositories.SceneRepository;
 import repositories.DrawerZBuffer;
-import views.ButtonPanel;
 import views.MainMenuBar;
 import views.callbacks.CameraMoveCallback;
+import views.callbacks.MovePointsCallback;
 import views.editor.PolygonEditorView;
-import views.user_input.AddPointView;
 import views.CanvasView;
-import views.user_input.AddPolygonView;
+import views.user_input.MoveView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class MainApplication extends JFrame {
     private final int DEFAULT_WIDTH = 960;
     private final int DEFAULT_HEIGHT = 640;
 
-    private final int BUTTON_PANEL_WIDTH = 250;
-
-    private ButtonPanel buttonPanel;
     private CanvasView canvas;
     private MainMenuBar menu;
+
+    private int pointNameFlag = 1;
 
     // architecture stuff
     private SceneController sceneController;
     private DrawController drawController;
 
+    private MovePointsCallback sharedMovePointsCallback;
+
     public MainApplication(String title) {
         super(title);
+        setShared();
         initGUI();
 
         sceneController = new SceneController(new SceneRepository());
         drawController = new DrawController(new DrawerZBuffer(canvas.getSize()));
 
-        setButtonPanelCallbacks();
         setMenuCallbacks();
         setCanvasCallbacks();
-
-        // DBG
-        try {
-            changeSceneRepository(sceneController.readFromFile("D:/courseCG/scenes/cube.txt"));
-        } catch (Exception e) {
-            System.out.println("dbg no");
-        }
     }
 
     private void initGUI() {
@@ -66,12 +61,7 @@ public class MainApplication extends JFrame {
         Container pane = getContentPane();
         pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
 
-        buttonPanel = new ButtonPanel();
-        buttonPanel.setMaximumSize(new Dimension(BUTTON_PANEL_WIDTH, DEFAULT_HEIGHT));
-        pane.add(buttonPanel);
-
         canvas = new CanvasView();
-        canvas.setMaximumSize(new Dimension(DEFAULT_WIDTH - BUTTON_PANEL_WIDTH, DEFAULT_HEIGHT));
         pane.add(canvas);
     }
 
@@ -79,26 +69,41 @@ public class MainApplication extends JFrame {
         sceneController.setSceneRepository(newRepo);
     }
 
+    private void setShared() {
+        sharedMovePointsCallback = (x, y, z) -> {
+            ArrayList<String> selected = drawController.getSelectedPointNames();
+            if (selected.size() != 0) {
+                sceneController.movePoints(selected, x, y, z);
+                return;
+            }
+
+            UUID selectedPoly = drawController.getSelectedPolyId();
+            if (selectedPoly != null) {
+                sceneController.movePoly(selectedPoly, x, y, z);
+            }
+        };
+    }
+
     private void setCanvasCallbacks() {
         canvas.renderCallback = (Graphics g) -> {
             Camera camera = sceneController.getCamera();
             camera.setScreenHeight(canvas.getHeight());
             camera.setScreenWidth(canvas.getWidth());
-            drawController.draw(g, sceneController.getCamera(), sceneController.getSceneRepository());
+            drawController.draw(g, sceneController.getCamera(), sceneController.getSceneRepository(), pointNameFlag);
         };
 
         canvas.setSelectCallback((x, y) -> {
             String id = drawController.getPointName(x, y);
             if (id != null) {
                 drawController.addSelectedPointName(id);
-                System.out.println("log - Selected new Point with Name=" + id);
+                GlobalLogger.getLogger().log(Level.INFO, "selected new Point with Name=" + id);
                 return;
             }
 
             UUID polyId = drawController.getPolyId(x, y);
             if (polyId != null) {
                 drawController.setSelectedPolyId(polyId);
-                System.out.println("log - Selected new Polygon with Name=" + polyId);
+                GlobalLogger.getLogger().log(Level.INFO, "selected new Polygon with Name=" + polyId);
             }
         });
 
@@ -134,18 +139,7 @@ public class MainApplication extends JFrame {
             }
         });
 
-        canvas.setMovePointsCallback((x, y, z) -> {
-            ArrayList<String> selected = drawController.getSelectedPointNames();
-            if (selected.size() != 0) {
-                sceneController.movePoints(selected, x, y, z);
-                return;
-            }
-
-            UUID selectedPoly = drawController.getSelectedPolyId();
-            if (selectedPoly != null) {
-                sceneController.movePoly(selectedPoly, x, y, z);
-            }
-        });
+        canvas.setMovePointsCallback(sharedMovePointsCallback);
     }
 
     private void setMenuCallbacks() {
@@ -156,76 +150,75 @@ public class MainApplication extends JFrame {
                 try {
                     SceneRepository newRepo = sceneController.readFromFile(fileChooser.getSelectedFile().toString());
                     changeSceneRepository(newRepo);
+                    canvas._repaint();
                 } catch (IOException ex) {
-                    System.out.println("log - " + Arrays.toString(ex.getStackTrace()));
+                    JOptionPane.showMessageDialog(this, "Ошибка при открытии файла");
+                    GlobalLogger.getLogger().severe("open from file error" + ex.getMessage() +
+                            "\n" + Arrays.toString(ex.getStackTrace()));
                 }
             }
         });
 
         menu.setSaveActionListener(e -> {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-                if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-
-                }
-        });
-    }
-
-    private void setButtonPanelCallbacks() {
-        buttonPanel.setAddPointButtonActionListener(e -> {
-            AddPointView frame = new AddPointView();
-            frame.setAddCallback(s -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 try {
-                    sceneController.add(s);
-                } catch (ExistedNameException e1) {
-                    System.out.println(e1.getMessage());
+                    sceneController.saveToFile(fileChooser.getSelectedFile().toString());
+                } catch (IOException ioException) {
+                    JOptionPane.showMessageDialog(this, "Ошибка при сохранении");
+                    GlobalLogger.getLogger().severe("save to file error" + ioException.getMessage() +
+                            "\n" + Arrays.toString(ioException.getStackTrace()));
                 }
-            });
-
-            frame.setVisible(true);
+            }
         });
 
-        buttonPanel.setAddPolygonButtonActionListener(e -> {
-            AddPolygonView frame = new AddPolygonView();
-
-            frame.setAddCallback(pointNames -> {
-                ArrayList<Point> points = new ArrayList<>();
-                for (String pName : pointNames) {
-                    try {
-                        points.add(sceneController.findPoint(pName));
-                    } catch (NotExistedNameException ex) {
-                        System.out.println(ex.getMessage());
-                        return;
-                    }
-                }
-
-                Point[] pArr = new Point[points.size()];
-                Polygon newPoly = new Polygon(points.toArray(pArr), new Color(0, 256, 256));
-                sceneController.add(newPoly);
-            });
-
-            frame.setVisible(true);
+        menu.setExitActionListener(e -> {
+            this.dispose();
         });
 
-        buttonPanel.setEditPolygonActionListener(e -> {
+        menu.setMoveActionListener(e -> {
+            if (drawController.getSelectedPolyId() == null && drawController.getSelectedPointNames().size() == 0) {
+                JOptionPane.showMessageDialog(this, "Не выбраны элементы для редактирования");
+                GlobalLogger.getLogger().severe("No elements for moving");
+                return;
+            }
+
+            MoveView moveView = new MoveView();
+            moveView.setAddCallback((x, y, z) -> {
+                sharedMovePointsCallback.callback(x, y, z);
+                canvas._repaint();
+            });
+            moveView.setVisible(true);
+        });
+
+        menu.setEditPolyActionListener(e -> {
             UUID selected = drawController.getSelectedPolyId();
             if (selected == null) {
-                System.out.println("log - Не выбран многоугольник"); // TODO: errorview
+                JOptionPane.showMessageDialog(this, "Не выбран многоугольник");
+                GlobalLogger.getLogger().severe("Polygon not selected");
                 return;
             }
 
             Polygon polygon = sceneController.getPolygonById(selected);
             if (polygon == null) {
-                System.out.println("log - Выбран уже не существующий многоугольник"); // TODO: errorview
+                JOptionPane.showMessageDialog(this, "Многоугольник был удален");
+                GlobalLogger.getLogger().severe("Polygon with UUID=" + selected + " already deleted");
                 return;
             }
 
             PolygonEditorView frame = new PolygonEditorView(polygon);
             frame.start();
         });
+
+        menu.setChangePointNameModeListener(e -> {
+            pointNameFlag = (pointNameFlag + 1) % 3;
+            canvas._repaint();
+        });
     }
 
     public static void main(String[] args) {
+        Locale.setDefault(Locale.US);
         JFrame frame = new MainApplication("Редактор поверхностей. Шацкий Р.Е.");
         frame.setVisible(true);
     }

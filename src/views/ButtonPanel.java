@@ -1,11 +1,9 @@
 package views;
 
 import views.callbacks.AddPointCallback;
-import views.callbacks.RenderCallback;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ButtonPanel extends JPanel {

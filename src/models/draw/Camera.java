@@ -33,7 +33,7 @@ public class Camera {
         createLookAt();
     }
 
-    public Camera(Vector position, Vector target, Vector up, double yaw, double pitch, int screenDistance) {
+    public Camera(Vector position, Vector target, Vector up, double yaw, double pitch, double screenDistance) {
         this.position = position;
         this.target = target;
         this.generalUp = up;
@@ -165,5 +165,13 @@ public class Camera {
 
     public double getZ() {
         return position.getZ();
+    }
+
+    public double getPitch() {
+        return pitch;
+    }
+
+    public double getYaw() {
+        return yaw;
     }
 }

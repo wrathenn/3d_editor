@@ -3,6 +3,7 @@ package controllers;
 import exceptions.ExistedNameException;
 import exceptions.NotExistedNameException;
 import io.FileSceneReader;
+import io.FileSceneWriter;
 import libs.HashMapUnique;
 import models.draw.Camera;
 import models.scene.Edge;
@@ -109,15 +110,19 @@ public class SceneController {
         Vector up = reader.readVector();
         double yaw = reader.readDouble();
         double pitch = reader.readDouble();
-        int screenDistance = reader.readInt();
+        double screenDistance = reader.readDouble();
         Camera newCamera = new Camera(position, target, up, yaw, pitch, screenDistance);
         newRepo.setCamera(newCamera);
 
         return newRepo;
     }
 
-    public void saveToFile(String filename) {
-
+    public void saveToFile(String filename) throws IOException {
+        FileSceneWriter writer = new FileSceneWriter(filename);
+        writer.writePoints(sceneRepository.getPoints().values());
+        writer.writePolygons(sceneRepository.getPolygons().values());
+        writer.writeCamera(sceneRepository.getCamera());
+        writer.finishWrite();
     }
 
     public void movePoints(ArrayList<String> nameIds, double x, double y, double z) {

@@ -72,7 +72,7 @@ public class DrawController {
 
     // ----- Нормальные методы ----- //
 
-    public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository) {
+    public void draw(Graphics canvas, Camera camera, SceneRepository sceneRepository, int pointNameMode) {
         if (canvas == null) {
             return;
         }
@@ -87,9 +87,11 @@ public class DrawController {
 
         drawCopy(sceneRepository, pointsToDraw, polygonsToDraw);
 
-        canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
+        canvas.setColor(Color.white);
+        canvas.fillRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
+//        canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
         camera.createLookAt();
-        drawConveyor(pointsToDraw, polygonsToDraw);
+        drawConveyor(pointsToDraw, polygonsToDraw, pointNameMode);
     }
 
     private void drawCopy(SceneRepository repo,
@@ -114,7 +116,8 @@ public class DrawController {
     }
 
     private void drawConveyor(HashMap<String, PointDraw> points,
-                              HashMap<UUID, PolygonDraw> polygons) {
+                              HashMap<UUID, PolygonDraw> polygons,
+                              int pointNameMode) {
 
         for (PointDraw p : points.values()) {
             drawer.transformPointOnCamera(p);
@@ -139,7 +142,7 @@ public class DrawController {
 
         for (PointDraw p : points.values()) {
             boolean isSelected = selectedPointNames.contains(p.getNameID());
-            drawer.drawPoint(p, isSelected);
+            drawer.drawPoint(p, isSelected, pointNameMode);
         }
     }
 
