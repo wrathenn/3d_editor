@@ -29,7 +29,6 @@ public class MoveView extends JFrame {
 
     public MoveView() throws HeadlessException {
         super("Перемещение");
-        getParent().setEnabled(false);
 
         setMinimumSize(new Dimension(320, 160));
 
