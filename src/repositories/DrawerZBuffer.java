@@ -1,5 +1,6 @@
 package repositories;
 
+import Jama.Matrix;
 import libs.SharedFunctions;
 import libs.SortedLinkedList;
 import models.draw.*;
@@ -118,7 +119,7 @@ public class DrawerZBuffer {
     }
 
     private boolean checkBuffer(int x, int y, double z) {
-        return zBuffer[x][y] <= z;
+        return zBuffer[x][y] < z;
     }
 
     private void _drawPixel(int x, int y, double z, Color c) {
@@ -193,7 +194,13 @@ public class DrawerZBuffer {
 
     // ----- Полигон
 
-    public void drawPolygon(PolygonDraw poly, UUID polyId) {
+    public void drawPolygon(PolygonDraw poly, UUID polyId, HashMap<String, PointDraw> pointsOufOfView) {
+        for (PointDraw p : poly.getPoints()) {
+            if (checkBoundaries((int) Math.round(p.getX()), (int) Math.round(p.getY()))
+                    || pointsOufOfView.containsKey(p.getNameID())) {
+                return;
+            }
+        }
         // В каждом ребре начало будет выше по Y, чем конец
         SortedLinkedList<EdgeDrawInfo> infoList = new SortedLinkedList<>((o1, o2) -> {
             int res1 = SharedFunctions.doubleCompare(o2.yBegin, o1.yBegin);
@@ -296,7 +303,7 @@ public class DrawerZBuffer {
 
     // ----- Для интерфейса
 
-    private void drawPointName(PointDraw p, int pointNameMode) {
+    private void drawPointName(PointDraw p, Point pointReal, int pointNameMode) {
         switch (pointNameMode) {
             case 1:
                 canvas.drawString(p.getNameID(), (int) p.getX() - 7, (int) p.getY() - 7);
@@ -304,9 +311,9 @@ public class DrawerZBuffer {
             case 2:
                 canvas.drawString(String.format("%s(%.3f, %.3f, %.3f)",
                                 p.getNameID(),
-                                p.getX(),
-                                p.getY(),
-                                p.getZ()
+                                pointReal.getX(),
+                                pointReal.getY(),
+                                pointReal.getZ()
                         ),
                         (int) p.getX() - 7, (int) p.getY() - 7);
                 break;
@@ -315,7 +322,7 @@ public class DrawerZBuffer {
         }
     }
 
-    public void drawPoint(PointDraw point, boolean isSelected, int pointNameMode) {
+    public void drawPoint(PointDraw point, Point pointReal, boolean isSelected, int pointNameMode) {
         int x = (int) point.getX();
         int y = (int) point.getY();
         double z = point.getZ();
@@ -329,7 +336,7 @@ public class DrawerZBuffer {
 
             canvas.setColor(isSelected ? Color.blue : Color.black);
             canvas.fillRect(x - 3, y - 3, 7, 7);
-            drawPointName(point, pointNameMode);
+            drawPointName(point, pointReal, pointNameMode);
 
             for (int i = -2; i < 3; i++) {
                 for (int k = -2; k < 5; k++) {

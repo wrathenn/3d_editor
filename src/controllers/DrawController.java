@@ -1,5 +1,6 @@
 package controllers;
 
+import io.GlobalLogger;
 import models.draw.Camera;
 import models.draw.EdgeDraw;
 import models.draw.PointDraw;
@@ -7,11 +8,13 @@ import models.draw.PolygonDraw;
 import models.scene.Edge;
 import models.scene.Point;
 import models.scene.Polygon;
+import models.scene.Vector;
 import repositories.DrawerZBuffer;
 import repositories.SceneRepository;
 
 import java.awt.*;
 import java.util.*;
+import java.util.logging.Level;
 
 public class DrawController {
     private DrawerZBuffer drawer;
@@ -76,22 +79,39 @@ public class DrawController {
         if (canvas == null) {
             return;
         }
-        drawer.setSize(camera.getScreenWidth(), camera.getScreenHeight());
-        drawer.clearBuffer();
 
-        drawer.setCanvas(canvas);
-        drawer.setCamera(camera);
+//        long cnt = 0;
+//        for (int i = 0; i < 1000; i++) {
 
-        HashMap<String, PointDraw> pointsToDraw = new HashMap<>();
-        HashMap<UUID, PolygonDraw> polygonsToDraw = new HashMap<>();
 
-        drawCopy(sceneRepository, pointsToDraw, polygonsToDraw);
+        long tBegin = System.currentTimeMillis();
+//        GlobalLogger.getLogger().log(Level.INFO, "draw_begin_time (ms) = " + tBegin);
 
-        canvas.setColor(Color.white);
-        canvas.fillRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
+        {
+            drawer.setSize(camera.getScreenWidth(), camera.getScreenHeight());
+            drawer.clearBuffer();
+
+            drawer.setCanvas(canvas);
+            drawer.setCamera(camera);
+
+            HashMap<String, PointDraw> pointsToDraw = new HashMap<>();
+            HashMap<UUID, PolygonDraw> polygonsToDraw = new HashMap<>();
+
+            drawCopy(sceneRepository, pointsToDraw, polygonsToDraw);
+
+            canvas.setColor(Color.white);
+            canvas.fillRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
 //        canvas.clearRect(0, 0, camera.getScreenWidth(), camera.getScreenHeight());
-        camera.createLookAt();
-        drawConveyor(pointsToDraw, polygonsToDraw, pointNameMode);
+            camera.createLookAt();
+            drawConveyor(pointsToDraw, polygonsToDraw, pointNameMode, sceneRepository.getPoints());
+        }
+
+        long tEnd = System.currentTimeMillis();
+        GlobalLogger.getLogger().log(Level.INFO, "draw_end_time (ms) = " + tEnd);
+        GlobalLogger.getLogger().log(Level.INFO, "draw_time (ms) = " + (tEnd - tBegin));
+//            cnt += (tEnd - tBegin);
+//        }
+//        GlobalLogger.getLogger().log(Level.INFO, "avg time (ms) = " + (double) cnt / 1000);
     }
 
     private void drawCopy(SceneRepository repo,
@@ -117,9 +137,17 @@ public class DrawController {
 
     private void drawConveyor(HashMap<String, PointDraw> points,
                               HashMap<UUID, PolygonDraw> polygons,
-                              int pointNameMode) {
-
+                              int pointNameMode, HashMap<String, Point> oldPoints) {
+        HashMap<String, PointDraw> pointsOutOfView = new HashMap<>();
         for (PointDraw p : points.values()) {
+            {
+                Vector po = p.getPoint().minus(drawer.camera.position);
+                Vector look = drawer.camera.forward;
+                if (po.getAngle(look) < 0) {
+                    pointsOutOfView.put(p.getNameID(), new PointDraw(p));
+                }
+            }
+
             drawer.transformPointOnCamera(p);
         }
 
@@ -128,21 +156,25 @@ public class DrawController {
             if (polyEntry.getKey() == selectedPolyId) {
                 poly.setColor(Color.blue);
             }
+
             poly.findNormalLine();
 
             // Найти цвет каждой точки, не находить, если уже найден
             findPointsColorInPolygon(poly);
 
             // Отрисовка полигона
-            drawer.drawPolygon(poly, polyEntry.getKey());
+            drawer.drawPolygon(poly, polyEntry.getKey(), pointsOutOfView);
 
             // Очистить цвет каждой точки
             clearPointsColorInPolygon(poly);
         }
 
         for (PointDraw p : points.values()) {
+            if (pointsOutOfView.containsKey(p.getNameID())) {
+                continue;
+            }
             boolean isSelected = selectedPointNames.contains(p.getNameID());
-            drawer.drawPoint(p, isSelected, pointNameMode);
+            drawer.drawPoint(p, oldPoints.get(p.getNameID()), isSelected, pointNameMode);
         }
     }
 

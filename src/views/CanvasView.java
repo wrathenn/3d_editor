@@ -20,7 +20,7 @@ public class CanvasView extends JPanel implements MouseListener, MouseMotionList
     private MovePointsCallback movePointsCallback;
 
     private double rotateSensitivity = 0.25f;
-    private double keyboardSensitivity = 2;
+    private double keyboardSensitivity = 8;
 
     // ----- Конструктор ----- //
 
