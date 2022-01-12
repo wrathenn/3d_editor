@@ -25,7 +25,7 @@ public class Camera {
 
     private int screenWidth;
     private int screenHeight;
-    private double screenDistance = 150;
+    private double screenDistance;
 
     // ----- Конструктор ----- //
 
@@ -152,7 +152,9 @@ public class Camera {
     }
 
     public void setScreenDistance(double screenDistance) {
-        this.screenDistance = screenDistance;
+        if (screenDistance > 0) {
+            this.screenDistance = screenDistance;
+        }
     }
 
     public double getX() {

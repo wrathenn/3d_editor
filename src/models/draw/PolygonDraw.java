@@ -56,6 +56,18 @@ public class PolygonDraw {
         this.color = color;
     }
 
+
+    public PointDraw[] getPoints() {
+        int size = edges.size();
+        PointDraw[] points = new PointDraw[size];
+
+        for (int i = 0; i < size; i++) {
+            points[i] = edges.get(i).getBegin();
+        }
+
+        return points;
+    }
+
     // ----- Остальные методы ----- //
 
     public void findNormalLine() {
