@@ -106,9 +106,9 @@ public class DrawController {
             drawConveyor(pointsToDraw, polygonsToDraw, pointNameMode, sceneRepository.getPoints());
         }
 
-        long tEnd = System.currentTimeMillis();
-        GlobalLogger.getLogger().log(Level.INFO, "draw_end_time (ms) = " + tEnd);
-        GlobalLogger.getLogger().log(Level.INFO, "draw_time (ms) = " + (tEnd - tBegin));
+//        long tEnd = System.currentTimeMillis();
+//        GlobalLogger.getLogger().log(Level.INFO, "draw_end_time (ms) = " + tEnd);
+//        GlobalLogger.getLogger().log(Level.INFO, "draw_time (ms) = " + (tEnd - tBegin));
 //            cnt += (tEnd - tBegin);
 //        }
 //        GlobalLogger.getLogger().log(Level.INFO, "avg time (ms) = " + (double) cnt / 1000);
